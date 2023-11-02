@@ -2,22 +2,19 @@
 
 namespace App\Entity;
 
-use App\Repository\PostRepository;
+use App\Repository\CommentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: PostRepository::class)]
-class Post
+#[ORM\Entity(repositoryClass: CommentRepository::class)]
+class Comment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
-
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(length: 1000)]
     private ?string $content = null;
 
     #[ORM\Column]
@@ -26,25 +23,20 @@ class Post
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $lastEdited = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $replyToId = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?user $user = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?post $post = null;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
-
-        return $this;
     }
 
     public function getContent(): ?string
@@ -83,6 +75,18 @@ class Post
         return $this;
     }
 
+    public function getReplyToId(): ?int
+    {
+        return $this->replyToId;
+    }
+
+    public function setReplyToId(?int $replyToId): static
+    {
+        $this->replyToId = $replyToId;
+
+        return $this;
+    }
+
     public function getUser(): ?user
     {
         return $this->user;
@@ -91,6 +95,18 @@ class Post
     public function setUser(?user $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getPost(): ?post
+    {
+        return $this->post;
+    }
+
+    public function setPost(?post $post): static
+    {
+        $this->post = $post;
 
         return $this;
     }
