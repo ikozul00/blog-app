@@ -24,6 +24,29 @@ class PostRepository extends ServiceEntityRepository
 //    /**
 //     * @return Post[] Returns an array of Post objects
 //     */
+    public function getPostsList(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT p.title
+            FROM App\Entity\Post p'
+        );
+
+        // returns an array of Product objects
+        return $query->getResult();
+    }
+
+    public function deletePost($id): int
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'DELETE App\Entity\Post p
+            WHERE p.id= :id'
+        )->setParameter('id', $id);
+
+        // returns an array of Product objects
+        return $query->getResult();
+    }
 //    public function findByExampleField($value): array
 //    {
 //        return $this->createQueryBuilder('p')
