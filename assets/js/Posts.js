@@ -16,7 +16,7 @@ export const Posts = ({}) => {
         <>
         {posts.map(post => (
             <div key={post.id}>
-                <p >{post.title}</p>
+                <a>{post.title}</a>
             </div>
         ))}
         </>
