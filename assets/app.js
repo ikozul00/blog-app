@@ -10,16 +10,22 @@ import './styles/app.css';
 
 // start the Stimulus application
 import './bootstrap';
-import {createRoot} from "react-dom/client";
+
+
 import React from "react";
 import ReactDom from 'react-dom';
+import { createRoot } from 'react-dom/client';
+import {Posts} from "./js/Posts";
 const App = () => {
     console.log("Component rendered");
-    return(<div>
-            <p>"Neki moj tekst"</p>
+    return(
+        <div>
+            <Posts/>
         </div>
     )
 }
-ReactDom.render(<App />, document.getElementById('root'));
+const root = createRoot(document.getElementById('root'));
+root.render(<App/>);
+//ReactDom.render(<App />, document.getElementById('root'));
 
 

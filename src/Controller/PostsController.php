@@ -16,7 +16,8 @@ class PostsController extends AbstractController
     function getPost(EntityManagerInterface $entityManager):Response
     {
         $posts=$entityManager->getRepository( Post::class)->getPostsList();
-        return $this->render("blog/posts.html.twig", ['posts' => $posts]);
+        return new JsonResponse($posts);
+        //return $this->render("blog/posts.html.twig", ['posts' => $posts]);
     }
 
     #[Route('/posts/{id}')]
@@ -29,7 +30,7 @@ class PostsController extends AbstractController
             );
         }
         // Create a JsonResponse and return it
-        return $this->render("blog/post.html.twig", ['post' => $post]);
+        return new Response($post);
 
     }
 

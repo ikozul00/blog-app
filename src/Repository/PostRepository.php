@@ -28,7 +28,7 @@ class PostRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
-            'SELECT p.title
+            'SELECT p.title, p.id
             FROM App\Entity\Post p'
         );
 
