@@ -12,6 +12,7 @@ import './styles/app.css';
 import './bootstrap';
 import {createRoot} from "react-dom/client";
 import React from "react";
+import ReactDom from 'react-dom';
 const App = () => {
     console.log("Component rendered");
     return(<div>
@@ -19,7 +20,6 @@ const App = () => {
         </div>
     )
 }
-const root = createRoot(document.getElementById('root'));
-root.render(App);
+ReactDom.render(<App />, document.getElementById('root'));
 
 
