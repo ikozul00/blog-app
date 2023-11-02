@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PostsController extends AbstractController
 {
+
     #[Route('/posts',name: 'postsList', methods: ['GET'])]
     function getPost(EntityManagerInterface $entityManager):Response
     {
