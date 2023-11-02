@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PostsController extends AbstractController
 {
-    #[Route('/')]
+    #[Route('/posts')]
     function getPost(EntityManagerInterface $entityManager):Response
     {
         $posts=$entityManager->getRepository( Post::class)->findAll();
