@@ -15,8 +15,16 @@ export const Posts = ({}) => {
     }, []);
 
     const handleClick = async () => {
-        const data = await fetch("/posts/delete/23", { method: 'DELETE' });
+        const data = await fetch("/posts/update/24",
+            { method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'title' : 'Really great post',
+                                            }
+                )}
+        );
         console.log(data);
+        const jsonData= await data.json();
+        console.log(jsonData);
     }
 
     return (

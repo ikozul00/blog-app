@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +21,7 @@ class PostsController extends AbstractController
         return new JsonResponse($posts);
     }
 
-    #[Route('/posts/{id}', methods: ['GET'])]
+    #[Route('/posts/load/{id}', methods: ['GET'])]
     function getPostDetails(EntityManagerInterface $entityManager, string $id):Response
     {
         $post=$entityManager->getRepository( Post::class)->find($id);
@@ -34,10 +35,41 @@ class PostsController extends AbstractController
 
     }
 
-    #Route['/posts/create', name:'createPost, methods: ['POST']
+    #[Route('/posts/create',name: 'createPost', methods: ['POST'])]
     function createPost(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $request->request->get(title);
+        $data=json_decode($request->getContent(), true);
+
+        $newPost = new Post();
+        $newPost->setTitle($data['title']);
+        $newPost->setContent($data['content']);
+        $newPost->setCreatedAt(new \DateTime());
+
+        $user = $entityManager->getRepository( User::class)->find($data['userId']);
+        $newPost->setUser($user);
+        $entityManager->persist($newPost);
+        $entityManager->flush();
+        $id = $newPost->getId();
+
+        return new Response('Saved new product with id '.$newPost->getId());
+
+    }
+
+    #[Route('/posts/update/{id}',name: 'createPost', methods: ['PUT'])]
+    function updatePost(Request $request, EntityManagerInterface $entityManager, string $id): Response
+    {
+        $data=json_decode($request->getContent(), true);
+
+        $post = $entityManager->getRepository( Post::class)->find($id);
+
+        $post->setTitle($data['title'] ?? $post->getTitle());
+        $post->setContent($data['content'] ?? $post->getContent());
+        $post->setLastEdited(new \DateTime());
+
+        $entityManager->flush();
+
+        return new Response('Updated product with id '.$post->getId());
+
     }
 
 
