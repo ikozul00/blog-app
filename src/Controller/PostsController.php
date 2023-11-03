@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Likes;
 use App\Entity\Post;
+use App\Entity\PostTag;
+use App\Entity\Tag;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,14 +27,14 @@ class PostsController extends AbstractController
     #[Route('/posts/load/{id}', methods: ['GET'])]
     function getPostDetails(EntityManagerInterface $entityManager, string $id):Response
     {
-        $post=$entityManager->getRepository( Post::class)->find($id);
-        if (!$post) {
+        $post=$entityManager->getRepository( Post::class)->getPost($id);
+        if (!$post[0]) {
             throw $this->createNotFoundException(
                 'No post found for id '.$id
             );
         }
         // Create a JsonResponse and return it
-        return new Response($post);
+        return new JsonResponse($post[0]);
 
     }
 
@@ -55,12 +58,18 @@ class PostsController extends AbstractController
 
     }
 
-    #[Route('/posts/update/{id}',name: 'createPost', methods: ['PUT'])]
-    function updatePost(Request $request, EntityManagerInterface $entityManager, string $id): Response
+    #[Route('/posts/update',name: 'createPost', methods: ['PUT'])]
+    function updatePost(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
 
-        $post = $entityManager->getRepository( Post::class)->find($id);
+        $post = $entityManager->getRepository( Post::class)->find($data['id']);
+
+        if(!$post){
+            throw $this->createNotFoundException(
+                'No post found for id '.$data['id']
+            );
+        }
 
         $post->setTitle($data['title'] ?? $post->getTitle());
         $post->setContent($data['content'] ?? $post->getContent());
@@ -84,4 +93,49 @@ class PostsController extends AbstractController
         }
         return new Response(status: 200);
     }
+
+    #[Route('/posts/addTag', name:'addTag', methods:['POST'])]
+    function addTag(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $data=json_decode($request->getContent(), true);
+
+        $newConnection = new PostTag();
+        $post = $entityManager->getRepository(Post::class)->find($data['postId']);
+        $tag = $entityManager->getRepository(Tag::class)->find($data['tagId']);
+        $newConnection -> setPost($post);
+        $newConnection -> setTag($tag);
+
+        $entityManager->persist($newConnection);
+        $entityManager->flush();
+        return new Response(status: 200);
+    }
+
+
+    #[Route('/posts/removeTag', name:'removeTag', methods:['DELETE'])]
+    function removeTag(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $data=json_decode($request->getContent(), true);
+
+        $numberOfDeleted=$entityManager->getRepository( PostTag::class)->deleteTagFromPost($data['postId'], $data['tagId']);
+        if($numberOfDeleted!=1){
+            throw $this->createNotFoundException(
+                'No data found'
+            );
+        }
+        return new Response(status: 200);
+    }
+
+    #[Route('/posts/like/{id}', name:'likePost', methods:['POST'])]
+    function likePost(Request $request, EntityManagerInterface $entityManager, string $id): Response
+    {
+        $data=json_decode($request->getContent(), true);
+        $newLike = new Likes();
+        $newLike->setPost($entityManager->getRepository(Post::class)->find($id));
+        $newLike->setUser($entityManager->getRepository(User::class) ->find($data['userId']));
+
+        $entityManager->persist($newLike);
+        $entityManager->flush();
+        return new Response(status: 200);
+    }
+
 }

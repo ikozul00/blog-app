@@ -21,6 +21,18 @@ class PostTagRepository extends ServiceEntityRepository
         parent::__construct($registry, PostTag::class);
     }
 
+    public function deleteTagFromPost($postId, $tagId): int
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'DELETE App\Entity\PostTag p
+            WHERE p.post= :postId AND  p.tag= :tagId'
+        )->setParameters(['postId'=> $postId, 'tagId'=> $tagId]);
+
+        // returns an array of Product objects
+        return $query->execute();
+    }
+
 //    /**
 //     * @return PostTag[] Returns an array of PostTag objects
 //     */

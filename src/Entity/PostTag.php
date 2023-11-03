@@ -15,35 +15,35 @@ class PostTag
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete:"CASCADE")]
-    private ?post $post = null;
+    private ?Post $post = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete:"CASCADE")]
-    private ?tag $tag = null;
+    private ?Tag $tag = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPost(): ?post
+    public function getPost(): ?Post
     {
         return $this->post;
     }
 
-    public function setPost(?post $post): static
+    public function setPost(?Post $post): static
     {
         $this->post = $post;
 
         return $this;
     }
 
-    public function getTag(): ?tag
+    public function getTag(): ?Tag
     {
         return $this->tag;
     }
 
-    public function setTag(?tag $tag): static
+    public function setTag(?Tag $tag): static
     {
         $this->tag = $tag;
 

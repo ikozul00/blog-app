@@ -21,6 +21,18 @@ class FavoritesRepository extends ServiceEntityRepository
         parent::__construct($registry, Favorites::class);
     }
 
+    public function deletePostFromFavorites($postId, $userId): int
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'DELETE App\Entity\Favorites f
+            WHERE f.post= :postId AND f.user= :userId'
+        )->setParameters(['postId' => $postId, 'userId' => $userId]);
+
+        // returns an array of Product objects
+        return $query->execute();
+    }
+
 //    /**
 //     * @return Favorites[] Returns an array of Favorites objects
 //     */

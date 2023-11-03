@@ -21,6 +21,30 @@ class TagRepository extends ServiceEntityRepository
         parent::__construct($registry, Tag::class);
     }
 
+    public function getTagsList(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT t.name, t.id
+            FROM App\Entity\Tag t'
+        );
+
+        // returns an array of Product objects
+        return $query->getResult();
+    }
+
+    public function deleteTag($id): int
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'DELETE App\Entity\Tag t
+            WHERE t.id= :id'
+        )->setParameter('id', $id);
+
+        // returns an array of Product objects
+        return $query->execute();
+    }
+
 //    /**
 //     * @return Tag[] Returns an array of Tag objects
 //     */

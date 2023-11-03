@@ -45,8 +45,23 @@ class PostRepository extends ServiceEntityRepository
         )->setParameter('id', $id);
 
         // returns an array of Product objects
+        return $query->execute();
+    }
+
+    public function getPost($id): Array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT p.title, p.content, p.createdAt, p.lastEdited FROM App\Entity\Post p
+            WHERE p.id= :id'
+        )->setParameter('id', $id);
+
+        // returns an array of Product objects
         return $query->getResult();
     }
+
+
+
 //    public function findByExampleField($value): array
 //    {
 //        return $this->createQueryBuilder('p')

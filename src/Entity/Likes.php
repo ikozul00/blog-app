@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\LikesRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LikesRepository::class)]
@@ -20,6 +21,9 @@ class Likes
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete:"CASCADE")]
     private ?post $post = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $timestamp = null;
 
     public function getId(): ?int
     {
@@ -46,6 +50,18 @@ class Likes
     public function setPost(?post $post): static
     {
         $this->post = $post;
+
+        return $this;
+    }
+
+    public function getTimestamp(): ?\DateTimeInterface
+    {
+        return $this->timestamp;
+    }
+
+    public function setTimestamp(\DateTimeInterface $timestamp): static
+    {
+        $this->timestamp = $timestamp;
 
         return $this;
     }
