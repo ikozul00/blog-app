@@ -1,3 +1,0 @@
-App\Entity\Post:
-  post_{1..10}:
-    title: <name()>
