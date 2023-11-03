@@ -22,8 +22,8 @@ class User
     private ?string $email = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?role $role = null;
+    #[ORM\JoinColumn(nullable: false, onDelete:"CASCADE")]
+    private ?Role $role = null;
 
 
 
@@ -56,12 +56,12 @@ class User
         return $this;
     }
 
-    public function getRole(): ?role
+    public function getRole(): ?Role
     {
         return $this->role;
     }
 
-    public function setRole(?role $role): static
+    public function setRole(?Role $role): static
     {
         $this->role = $role;
 

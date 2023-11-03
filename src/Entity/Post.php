@@ -27,8 +27,8 @@ class Post
     private ?\DateTimeInterface $lastEdited = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?user $user = null;
+    #[ORM\JoinColumn(nullable: false, onDelete:"CASCADE")]
+    private ?User $user = null;
 
     public function getId(): ?int
     {
@@ -83,12 +83,12 @@ class Post
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 

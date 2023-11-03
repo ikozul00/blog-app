@@ -16,6 +16,8 @@ import React from "react";
 import ReactDom from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import {Posts} from "./js/Posts";
+
+
 const App = () => {
     console.log("Component rendered");
     return(
