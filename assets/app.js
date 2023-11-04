@@ -18,10 +18,11 @@ import { createRoot } from 'react-dom/client';
 import {Posts} from "./components/Posts";
 import {Post, loader as postLoader} from "./components/Post";
 import {
-    createBrowserRouter,
+    createBrowserRouter, Link,
     RouterProvider,
 } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
+import {Registration} from "./components/Registration";
 
 
 
@@ -30,6 +31,7 @@ const App = () => {
     return(
         <div>
             <Posts/>
+            <Link to={"/registration"}>Registration</Link>
         </div>
     )
 }
@@ -45,6 +47,10 @@ const router = createBrowserRouter([
         element: <Post/>,
         loader: postLoader,
     },
+    {
+        path: "/registration",
+        element: <Registration/>
+    }
 
 ]);
 

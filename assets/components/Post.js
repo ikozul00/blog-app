@@ -78,7 +78,6 @@ export const Post = ()  => {
             </div>
             <button onClick={handleFavoriteClick}>{isFavorite ? "unfavorite" : "favorite"}</button>
 
-
         </div>
     )
 }
