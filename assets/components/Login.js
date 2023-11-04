@@ -1,11 +1,13 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {redirect} from "react-router-dom";
+import {redirect, useNavigate} from "react-router-dom";
 
 export const Login= () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    const navigate = useNavigate();
 
     const handleEmail = (e) => {
         setEmail(e.target.value);
@@ -24,7 +26,10 @@ export const Login= () => {
         }
 
         try {
-            const response = await axios.post("/api/login", {'username': email, 'password': password});
+            const response = await axios.post("/api/profile/login", {'username': email, 'password': password});
+            const role = response.data.role.includes('ROLE_ADMIN') ? 'admin' : 'user';
+            localStorage.setItem('user',JSON.stringify({'id': response.data.id, 'role':role }));
+            navigate("/");
         }
         catch(error){
             if (error.response) {
@@ -39,7 +44,7 @@ export const Login= () => {
                 console.log('Error', error.message);
             }
         }
-        redirect("/");
+
     }
 
 

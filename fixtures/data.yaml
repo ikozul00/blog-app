@@ -2,20 +2,6 @@ App\Entity\Tag:
   tag_{1..10}:
     name: '<realText(60, 2)>'
 
-
-App\Entity\Role:
-  role1:
-    name: 'admin'
-  role2:
-    name: 'user'
-
-App\Entity\User:
-  user_{1..10}:
-    username: '<username()>'
-    email: '<email()>'
-    role: '@role*'
-
-
 App\Entity\Post:
   post_{1..10}:
     title: '<realText(60, 2)>'

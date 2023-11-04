@@ -34,7 +34,7 @@ export const Registration= () => {
             setError("Passwords do not match.");
             return;
         }
-        const response =await  axios.post("/api/registration", {'email': email, 'password':password});
+        const response =await  axios.post("/api/profile/registration", {'email': email, 'password':password});
         console.log(response);
         if(response.data==="User exists."){
             setError("User with this email already exists.");

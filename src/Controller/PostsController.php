@@ -21,6 +21,7 @@ class PostsController extends AbstractController
     #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
     function fetchPosts(EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         $posts=$entityManager->getRepository( Post::class)->getPostsList();
         return new JsonResponse($posts);
     }

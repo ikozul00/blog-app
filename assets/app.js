@@ -24,6 +24,8 @@ import {
 import ErrorPage from "./components/ErrorPage";
 import {Registration} from "./components/Registration";
 import {Login} from "./components/Login";
+import {Layout} from "./components/Layout";
+import {Profile} from "./components/Profile";
 
 
 
@@ -41,22 +43,34 @@ const App = () => {
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <App/>,
+        element: <Layout/>,
         errorElement: <ErrorPage/>,
+        children:[
+            {
+                path: "/",
+                element: <App/>,
+            },
+            {
+                path: "/posts/:postId",
+                element: <Post/>,
+                loader: postLoader,
+            },
+            {
+                path: "/registration",
+                element: <Registration/>
+            },
+            {
+                path: "/login",
+                element: <Login/>
+            },
+            {
+                path: "/profile",
+                element: <Profile/>
+            }
+        ]
     },
-    {
-        path: "/posts/:postId",
-        element: <Post/>,
-        loader: postLoader,
-    },
-    {
-        path: "/registration",
-        element: <Registration/>
-    },
-    {
-        path: "/login",
-        element: <Login/>
-    }
+
+
 
 ]);
 

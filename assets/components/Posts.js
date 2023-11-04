@@ -5,9 +5,12 @@ import {Link} from "react-router-dom";
 export const Posts = ({}) => {
     const [posts, setPosts] = useState([]);
 
+    const user = JSON.parse(localStorage.getItem('user'));
+
     useEffect( () => {
         const getData = async () =>{
             const data = await fetch("/api/posts");
+            console.log(data);
             const jsonData= await data.json();
             setPosts(jsonData);
         }
@@ -23,9 +26,7 @@ export const Posts = ({}) => {
                                             }
                 )}
         );
-        console.log(data);
         const jsonData= await data.json();
-        console.log(jsonData);
     }
 
     const tagsFunctions = async () => {
