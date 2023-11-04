@@ -23,6 +23,7 @@ import {
 } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
 import {Registration} from "./components/Registration";
+import {Login} from "./components/Login";
 
 
 
@@ -32,6 +33,7 @@ const App = () => {
         <div>
             <Posts/>
             <Link to={"/registration"}>Registration</Link>
+            <Link to={"/login"}>Login</Link>
         </div>
     )
 }
@@ -50,6 +52,10 @@ const router = createBrowserRouter([
     {
         path: "/registration",
         element: <Registration/>
+    },
+    {
+        path: "/login",
+        element: <Login/>
     }
 
 ]);
