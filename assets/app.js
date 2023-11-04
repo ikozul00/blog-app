@@ -13,12 +13,11 @@ import './bootstrap';
 
 
 import React from "react";
-import ReactDom from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import {Posts} from "./components/Posts";
 import {Post, loader as postLoader} from "./components/Post";
 import {
-    createBrowserRouter, Link,
+    createBrowserRouter,
     RouterProvider,
 } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
@@ -28,7 +27,7 @@ import {Layout} from "./components/Layout";
 import {Profile} from "./components/Profile";
 import {NewPost} from "./components/NewPost";
 import {UpdatePost} from "./components/UpdatePost";
-
+import {Tags, loader as tagsLoader} from "./components/Tags";
 
 
 const App = () => {
@@ -71,6 +70,11 @@ const router = createBrowserRouter([
             {
                 path: "/login",
                 element: <Login/>
+            },
+            {
+                path: "/tags",
+                element: <Tags/>,
+                loader: tagsLoader,
             },
             {
                 path: "/profile",

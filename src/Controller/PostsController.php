@@ -111,14 +111,20 @@ class PostsController extends AbstractController
         return new Response(status: 200);
     }
 
+
     #[Route('/api/posts/addTag', name:'addTag', methods:['POST'])]
     function addTag(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
-
-        $newConnection = new PostTag();
         $post = $entityManager->getRepository(Post::class)->find($data['postId']);
         $tag = $entityManager->getRepository(Tag::class)->find($data['tagId']);
+        $isExist = $entityManager->getRepository(PostTag::class) ->count(['post'=>$post, 'tag'=>$tag]);
+        if($isExist !== 0){
+            return new Response("Exists.");
+        }
+
+        $newConnection = new PostTag();
+
         $newConnection -> setPost($post);
         $newConnection -> setTag($tag);
 

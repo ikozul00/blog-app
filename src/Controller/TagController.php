@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TagController extends AbstractController
 {
@@ -21,6 +22,7 @@ class TagController extends AbstractController
 
 
     #[Route('/api/tags/create', name:'createTag', methods:['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     function createTag(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -34,6 +36,7 @@ class TagController extends AbstractController
     }
 
     #[Route('/api/tags/update', name:'updateTag', methods:['PUT'])]
+    #[IsGranted('ROLE_ADMIN')]
     function updateTag(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -54,6 +57,7 @@ class TagController extends AbstractController
 
 
     #[Route('/api/tags/delete/{id}', name:'deleteTag', methods:['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     function deleteTag(EntityManagerInterface $entityManager, string $id): Response
     {
        $numberOfDeleted = $entityManager->getRepository(Tag::class) -> deleteTag($id);

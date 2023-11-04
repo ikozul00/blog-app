@@ -18,6 +18,10 @@ export const Layout = () => {
                 <li>
                     <Link to={"/registration"}>Registration</Link>
                 </li>
+                {/*TODO: {user && user.role==='admin' && <li>*/}
+                {user && <li>
+                    <Link to={"/tags"}>Tags</Link>
+                </li>}
                 {user && <li>
                     <Link to={"/profile"}>Profile</Link>
                 </li>}

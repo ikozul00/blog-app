@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useLoaderData, useNavigate} from "react-router-dom";
 import {Comments} from "./Comments";
@@ -25,9 +25,25 @@ export const Post = ()  => {
 
     const [likeNumber, setLikeNumber] = useState(likes);
     const [isFavorite, setIsFavorite] = useState(isFavoriteValue);
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const [selectedTag, setSelectedTag] = useState("");
+    const [allTags, setAllTags] = useState([]);
+    const [postTags, setPostTags] = useState(tags);
+    const [error, setError] = useState("");
 
     const user = JSON.parse(localStorage.getItem('user'));
     const navigation = useNavigate();
+
+    useEffect(() => {
+        const getTags = async () => {
+            const response = await axios.get(`/api/tags`);
+            if(response.status !== 200){
+                return{error: "Error while fetching tags."}
+            }
+            setAllTags(response.data);
+        }
+        getTags();
+    }, [])
 
     const handleLikeClick = async () => {
         const response = await axios.post(`/api/likes`, {postId:post.postId});
@@ -76,6 +92,37 @@ export const Post = ()  => {
         navigation(`/posts/updatePost/${post.postId}`)
     }
 
+    const handleTagOption = (e) => {
+        setSelectedTag(e.target.value);
+    }
+
+    const handleAddTagToPost = async () => {
+        try {
+            const response = await axios.post(`/api/posts/addTag`,
+                {'postId': post.postId, 'tagId': selectedTag});
+            if(response.data === "Exists."){
+                setError("Tag already added.");
+                return;
+            }
+            setPostTags([...postTags, selectedTag]);
+            setIsDropdownVisible(false);
+        }
+        catch(error){
+            if (error.response) {
+                console.log(error.response);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+        }
+
+    }
+
+    const handleDropdownVisible = () => {
+        setIsDropdownVisible(true);
+    }
+
     return(
         <div>
             <h2>{post?.title}</h2>
@@ -86,14 +133,23 @@ export const Post = ()  => {
                 post?.lastEdited && <p>Edited: {formatDate(post?.lastEdited.date)}</p>
             }
 
-            {tags.length!==0 &&<div>
+            <div>
                  <p>Tags:</p>
                 {
-                    tags?.map(tag => <span key={tag.id}>{tag.name}</span>
+                    postTags?.map(tag => <span key={tag.id}>{tag.name}</span>
                     )
                 }
+                {!isDropdownVisible && user && user.role==='admin' && <button onClick={handleDropdownVisible}>Add tag</button>}
+                {isDropdownVisible && <div>
+                    <select onChange={handleTagOption}  id="tags" value={selectedTag}>
+                        {
+                            allTags.map(tag => <option value={tag.id} key={tag.id}>{tag.name}</option>)
+                        }
+                    </select>
+                    {error && <p>{error}</p>}
+                    <button onClick={handleAddTagToPost}>Choose</button>
+                </div>}
             </div>
-            }
             <div>
                 <span>Likes: {likeNumber} </span>
                 {user && <button onClick={handleLikeClick}>Add like</button>}
