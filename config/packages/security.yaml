@@ -33,9 +33,10 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/api/profile, roles: ROLE_USER }
-        - { path: ^/api/login, roles: ROLE_USER }
-        - { path: ^/api/registration, roles: ROLE_USER }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/registration, roles: PUBLIC_ACCESS }
+        - { path: ^/api/logout, roles: ROLE_USER }
+        - { path: /api/posts, roles: PUBLIC_ACCESS }
         - { path: ^/api/posts/create, roles: ROLE_ADMIN }
 
 

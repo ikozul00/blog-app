@@ -52,7 +52,7 @@ class PostRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
-            'SELECT p.title, p.content, p.createdAt, p.lastEdited,p.id AS postId, u.email, u.id AS userId 
+            'SELECT p.title, p.content, p.createdAt, p.lastEdited,p.id AS postId, u.username, u.id AS userId 
             FROM App\Entity\Post p JOIN p.user u
             WHERE p.id= :id'
         )->setParameter('id', $id);

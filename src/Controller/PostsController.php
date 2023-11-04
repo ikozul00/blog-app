@@ -21,7 +21,6 @@ class PostsController extends AbstractController
     #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
     function fetchPosts(EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         $posts=$entityManager->getRepository( Post::class)->getPostsList();
         return new JsonResponse($posts);
     }
@@ -142,6 +141,7 @@ class PostsController extends AbstractController
     #[Route('/api/posts/like/{id}', name:'likePost', methods:['POST'])]
     function likePost(Request $request, EntityManagerInterface $entityManager, string $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         $data=json_decode($request->getContent(), true);
         $newLike = new Likes();
         $newLike->setPost($entityManager->getRepository(Post::class)->find($id));

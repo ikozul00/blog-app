@@ -13,13 +13,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FavoritesController extends AbstractController
 {
-    #[Route('/api/addToFavorites/{id}', name:'addPostToFavorites', methods:['POST'])]
-    function addToFavorites(Request $request, EntityManagerInterface $entityManager, string $id): Response
+    #[Route('/api/addToFavorites', name:'addPostToFavorites', methods:['POST'])]
+    function addToFavorites(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         $data=json_decode($request->getContent(), true);
         $newFavorite = new Favorites();
-        $newFavorite->setUser($entityManager->getRepository(User::class)->find($data['userId']));
-        $newFavorite->setPost($entityManager->getRepository(Post::class)->find($id));
+        $newFavorite->setUser($this->getUser());
+        $newFavorite->setPost($entityManager->getRepository(Post::class)->find($data['postId']));
 
         $entityManager->persist($newFavorite);
         $entityManager->flush();
@@ -27,11 +28,12 @@ class FavoritesController extends AbstractController
         return new Response('Saved new favorite with id '.$newFavorite->getId());
     }
 
-    #[Route('/api/removeFromFavorites/{postId}/{userId}', name:'removeFavorite', methods:['DELETE'])]
-    function removeFromFavorites(Request $request, EntityManagerInterface $entityManager, string $userId, string $postId): Response
+    #[Route('/api/removeFromFavorites/{postId}', name:'removeFavorite', methods:['DELETE'])]
+    function removeFromFavorites(Request $request, EntityManagerInterface $entityManager, string $postId): Response
     {
-        $data=json_decode($request->getContent(), true);
-        $numberOfDeleted = $entityManager->getRepository(Favorites::class) -> deletePostFromFavorites($postId, $userId);
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+        $user = $this->getUser();
+        $numberOfDeleted = $entityManager->getRepository(Favorites::class) -> deletePostFromFavorites($postId, $user->getUserIdentifier());
 
         if($numberOfDeleted==0){
             throw $this->createNotFoundException(

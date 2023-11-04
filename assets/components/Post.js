@@ -28,7 +28,7 @@ export const Post = ()  => {
 
     const handleLikeClick = async () => {
         //TODO: change userID
-        const response = await axios.post(`/api/likes/${post.postId}`, {userId:64});
+        const response = await axios.post(`/api/likes`, {postId:post.postId});
         if(response.status!==200){
             console.log("Error while adding like.");
             return 0;
@@ -38,8 +38,7 @@ export const Post = ()  => {
 
     const handleFavoriteClick = async () => {
         if(isFavorite) {
-            //TODO: change userID
-            const response = await axios.delete(`/api/removeFromFavorites/${post.postId}/64`);
+            const response = await axios.delete(`/api/removeFromFavorites/${post.postId}`);
             if (response.status !== 200) {
                 console.log("Error while removing from favorites.");
                 return 0;
@@ -48,7 +47,7 @@ export const Post = ()  => {
             return 0;
         }
         //TODO: change userID
-        const response = await axios.post(`/api/addToFavorites/${post.postId}`, {userId:64});
+        const response = await axios.post(`/api/addToFavorites`, {'postId':post.postId});
         if (response.status !== 200) {
             console.log("Error while adding to favorites.");
             return 0;
@@ -74,9 +73,11 @@ export const Post = ()  => {
             </div>
             }
             <div>
-                <span>{likeNumber} </span><button onClick={handleLikeClick}>Like</button>
+                <span>Likes: {likeNumber} </span>
+                {user && <button onClick={handleLikeClick}>Add like</button>}
             </div>
-            <button onClick={handleFavoriteClick}>{isFavorite ? "unfavorite" : "favorite"}</button>
+            {user && <button onClick={handleFavoriteClick}>{isFavorite ? "unfavorite" : "favorite"}</button>}
+
 
         </div>
     )

@@ -13,13 +13,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class LikesController extends AbstractController
 {
-    #[Route('/api/likes/{id}', name:'addLikeToPost', methods:['POST'])]
-    function addLikeToPost(Request $request, EntityManagerInterface $entityManager, string $id): Response
+    #[Route('/api/likes', name:'addLikeToPost', methods:['POST'])]
+    function addLikeToPost(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         $data=json_decode($request->getContent(), true);
         $newLike = new Likes();
-        $newLike->setUser($entityManager->getRepository(User::class)->find($data['userId']));
-        $newLike->setPost($entityManager->getRepository(Post::class)->find($id));
+        $newLike->setUser($this->getUser());
+        $newLike->setPost($entityManager->getRepository(Post::class)->find($data['postId']));
         $newLike->setTimestamp(new \DateTime());
 
         $entityManager->persist($newLike);
