@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import axios from "axios";
 import {useLoaderData, useNavigate} from "react-router-dom";
+import {Comments} from "./Comments";
 
 
 export const loader = async ({params}) => {
@@ -12,14 +13,15 @@ export const loader = async ({params}) => {
     return postData.data;
 }
 
-const formatDate = (dateString) => {
+export const formatDate = (dateString) => {
+    console.log(dateString);
     const date = new Date(dateString);
     return date.toLocaleDateString();
 }
 
 
 export const Post = ()  => {
-    const {post, isFavoriteValue, likes, tags} = useLoaderData();
+    const {post, isFavoriteValue, likes, tags, comments} = useLoaderData();
 
     const [likeNumber, setLikeNumber] = useState(likes);
     const [isFavorite, setIsFavorite] = useState(isFavoriteValue);
@@ -78,11 +80,12 @@ export const Post = ()  => {
         <div>
             <h2>{post?.title}</h2>
             <p>{post?.content}</p>
-            <p>by {post?.username}</p>
+            <p>by {post?.email}</p>
             <p>Created: {formatDate(post?.createdAt.date)}</p>
             {
                 post?.lastEdited && <p>Edited: {formatDate(post?.lastEdited.date)}</p>
             }
+
             {tags.length!==0 &&<div>
                  <p>Tags:</p>
                 {
@@ -100,6 +103,11 @@ export const Post = ()  => {
             {user && <button onClick={handleDeletePost}> Delete Post</button>}
             <br/>
             {user && <button onClick={handleUpdatePost}> Update Post</button>}
+            <div>
+                <h3>Comments</h3>
+                <Comments commentsData={comments} postId={post.postId}></Comments>
+            </div>
+
 
 
         </div>

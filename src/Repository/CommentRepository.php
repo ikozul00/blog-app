@@ -21,6 +21,29 @@ class CommentRepository extends ServiceEntityRepository
         parent::__construct($registry, Comment::class);
     }
 
+    public function findByPostId($id): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT c.content,c.createdAt, c.id AS commentId, u.email, u.id AS userId
+            FROM App\Entity\Comment c JOIN c.user u WHERE c.post= :id'
+        )->setParameter(key:'id', value:$id);
+
+        return $query->getResult();
+    }
+
+    public function deleteComment($id): int
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'DELETE App\Entity\Comment c
+            WHERE c.id= :id'
+        )->setParameter('id', $id);
+
+        // returns an array of Product objects
+        return $query->execute();
+    }
+
 //    /**
 //     * @return Comment[] Returns an array of Comment objects
 //     */

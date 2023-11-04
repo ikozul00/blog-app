@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\Favorites;
 use App\Entity\Likes;
 use App\Entity\Post;
@@ -38,6 +39,7 @@ class PostsController extends AbstractController
         }
         $data['post'] = $post[0];
         $data['tags'] = $entityManager->getRepository(Tag :: class) ->findByPostId($id);
+        $data['comments'] = $entityManager->getRepository(Comment::class)->findByPostId($id);
         $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($id, 65);
         if($isFavorite==0){
             $data['ifFavorite']=false;

@@ -29,7 +29,6 @@ class TagRepository extends ServiceEntityRepository
             FROM App\Entity\Tag t'
         );
 
-        // returns an array of Product objects
         return $query->getResult();
     }
 
@@ -41,7 +40,6 @@ class TagRepository extends ServiceEntityRepository
             FROM App\Entity\PostTag d JOIN d.post p JOIN d. tag t WHERE d.post= :id'
         )->setParameter(key:'id', value:$id);
 
-        // returns an array of Product objects
         return $query->getResult();
     }
 
@@ -53,7 +51,6 @@ class TagRepository extends ServiceEntityRepository
             WHERE t.id= :id'
         )->setParameter('id', $id);
 
-        // returns an array of Product objects
         return $query->execute();
     }
 

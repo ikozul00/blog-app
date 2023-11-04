@@ -22,19 +22,13 @@ class Comment
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $lastEdited = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $replyToId = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?User $user = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
-    private ?user $user = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
-    private ?post $post = null;
+    private ?Post $post = null;
 
     public function getId(): ?int
     {
@@ -65,48 +59,25 @@ class Comment
         return $this;
     }
 
-    public function getLastEdited(): ?\DateTimeInterface
-    {
-        return $this->lastEdited;
-    }
 
-    public function setLastEdited(?\DateTimeInterface $lastEdited): static
-    {
-        $this->lastEdited = $lastEdited;
-
-        return $this;
-    }
-
-    public function getReplyToId(): ?int
-    {
-        return $this->replyToId;
-    }
-
-    public function setReplyToId(?int $replyToId): static
-    {
-        $this->replyToId = $replyToId;
-
-        return $this;
-    }
-
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getPost(): ?post
+    public function getPost(): ?Post
     {
         return $this->post;
     }
 
-    public function setPost(?post $post): static
+    public function setPost(?Post $post): static
     {
         $this->post = $post;
 
