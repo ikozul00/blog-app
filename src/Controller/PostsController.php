@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class PostsController extends AbstractController
 {
@@ -50,6 +51,7 @@ class PostsController extends AbstractController
 
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/create',name: 'createPost', methods: ['POST'])]
     function createPost(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -69,6 +71,7 @@ class PostsController extends AbstractController
 
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/update',name: 'updatePost', methods: ['PUT'])]
     function updatePost(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -93,6 +96,7 @@ class PostsController extends AbstractController
     }
 
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/delete/{id}', name:'deletePost', methods: ['DELETE'])]
     function deletePost(EntityManagerInterface $entityManager, string $id): Response
     {

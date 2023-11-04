@@ -1,13 +1,16 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {redirect, useNavigate} from "react-router-dom";
+import { useLoaderData, useNavigate} from "react-router-dom";
 
-export const NewPost= () => {
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
+export const UpdatePost= () => {
+    const {post} = useLoaderData();
+
+    const [title, setTitle] = useState(post?.title || "");
+    const [content, setContent] = useState(post?.content || "");
     const [error, setError] = useState("");
 
     const navigate = useNavigate();
+
 
     const handleTitle = (e) => {
         setTitle(e.target.value);
@@ -26,9 +29,9 @@ export const NewPost= () => {
         }
 
         try {
-            const response = await axios.post("/api/posts/create", {'title': title, 'content': content});
+            const response = await axios.put("/api/posts/update", {'id': post.postId, 'title': title, 'content': content});
             if(response.status===200){
-                navigate(`/posts/${response.data.id}`);
+                navigate(`/posts/${post.postId}`);
             }
         }
         catch(error){
@@ -47,7 +50,7 @@ export const NewPost= () => {
 
     return(
         <div>
-            <h2>New Post</h2>
+            <h2>Update Post</h2>
             <form>
                 <label className="label">Title</label>
                 <input onChange={handleTitle}

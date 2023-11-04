@@ -12,7 +12,6 @@ export const Posts = ({}) => {
     useEffect( () => {
         const getData = async () =>{
             const data = await fetch("/api/posts");
-            console.log(data);
             const jsonData= await data.json();
             setPosts(jsonData);
         }
@@ -73,27 +72,6 @@ export const Posts = ({}) => {
         console.log(jsonData);
     }
 
-    const addLike = async () => {
-        const data = await fetch("/likes/24", {
-            method:"POST",
-            headers: { 'Content-Type': 'application/json' }, body:JSON.stringify({'userId': '62'})});
-        console.log(data);
-        const jsonData= await data.json();
-        console.log(jsonData);
-
-    }
-
-    const addFavorite = async () => {
-        //const data = await fetch("/addToFavorites/24", {
-        //    method:"POST",
-        //    headers: { 'Content-Type': 'application/json' }, body:JSON.stringify({'userId': '62'})});
-        const data = await fetch("/removeFromFavorites/24/62", {
-            method:"DELETE",
-           });
-        console.log(data);
-        const jsonData= await data.json();
-        console.log(jsonData);
-    }
 
     const handleAddPost = () => {
         navigation("/posts/addPost")

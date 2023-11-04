@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {useLoaderData} from "react-router-dom";
+import {useLoaderData, useNavigate} from "react-router-dom";
 
 
 export const loader = async ({params}) => {
@@ -25,9 +25,9 @@ export const Post = ()  => {
     const [isFavorite, setIsFavorite] = useState(isFavoriteValue);
 
     const user = JSON.parse(localStorage.getItem('user'));
+    const navigation = useNavigate();
 
     const handleLikeClick = async () => {
-        //TODO: change userID
         const response = await axios.post(`/api/likes`, {postId:post.postId});
         if(response.status!==200){
             console.log("Error while adding like.");
@@ -46,13 +46,32 @@ export const Post = ()  => {
             setIsFavorite(false);
             return 0;
         }
-        //TODO: change userID
         const response = await axios.post(`/api/addToFavorites`, {'postId':post.postId});
         if (response.status !== 200) {
             console.log("Error while adding to favorites.");
             return 0;
         }
         setIsFavorite(true);
+    }
+
+    const handleDeletePost = async () => {
+        try {
+            const response = await axios.delete(`/api/posts/delete/${post.postId}`);
+            navigation("/");
+        }
+        catch(error){
+            if (error.response) {
+                console.log(error.response);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+        }
+    }
+
+    const handleUpdatePost = () =>{
+        navigation(`/posts/updatePost/${post.postId}`)
     }
 
     return(
@@ -77,6 +96,10 @@ export const Post = ()  => {
                 {user && <button onClick={handleLikeClick}>Add like</button>}
             </div>
             {user && <button onClick={handleFavoriteClick}>{isFavorite ? "unfavorite" : "favorite"}</button>}
+            <br/>
+            {user && <button onClick={handleDeletePost}> Delete Post</button>}
+            <br/>
+            {user && <button onClick={handleUpdatePost}> Update Post</button>}
 
 
         </div>

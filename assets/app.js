@@ -27,6 +27,7 @@ import {Login} from "./components/Login";
 import {Layout} from "./components/Layout";
 import {Profile} from "./components/Profile";
 import {NewPost} from "./components/NewPost";
+import {UpdatePost} from "./components/UpdatePost";
 
 
 
@@ -35,8 +36,6 @@ const App = () => {
     return(
         <div>
             <Posts/>
-            <Link to={"/registration"}>Registration</Link>
-            <Link to={"/login"}>Login</Link>
         </div>
     )
 }
@@ -59,6 +58,11 @@ const router = createBrowserRouter([
             {
                 path: "/posts/addPost",
                 element: <NewPost/>,
+            },
+            {
+                path: "/posts/updatePost/:postId",
+                element: <UpdatePost/>,
+                loader: postLoader,
             },
             {
                 path: "/registration",

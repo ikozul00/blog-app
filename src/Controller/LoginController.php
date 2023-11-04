@@ -23,6 +23,6 @@ class LoginController extends AbstractController
     #[Route('/api/logout', name: 'app_logout', methods: ['GET'])]
     public function logout(): never
     {
-
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
     }
 }
