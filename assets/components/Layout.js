@@ -23,7 +23,7 @@ export const Layout = () => {
                     <Link to={"/tags"}>Tags</Link>
                 </li>}
                 {user && <li>
-                    <Link to={"/profile"}>Profile</Link>
+                    <Link to={`/profile/${user.id}`}>Profile</Link>
                 </li>}
 
             </ul>

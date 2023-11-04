@@ -42,6 +42,16 @@ class FavoritesRepository extends ServiceEntityRepository
         return $query->getSingleScalarResult();
     }
 
+    public function findByUserId($userId): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT p.title, p.id AS postId FROM App\Entity\Favorites f JOIN f.post p
+            WHERE f.user= :userId'
+        )->setParameters(['userId' => $userId]);
+        return $query->getResult();
+    }
+
 //    /**
 //     * @return Favorites[] Returns an array of Favorites objects
 //     */

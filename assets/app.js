@@ -24,7 +24,7 @@ import ErrorPage from "./components/ErrorPage";
 import {Registration} from "./components/Registration";
 import {Login} from "./components/Login";
 import {Layout} from "./components/Layout";
-import {Profile} from "./components/Profile";
+import {Profile, loader as profileLoader} from "./components/Profile";
 import {NewPost} from "./components/NewPost";
 import {UpdatePost} from "./components/UpdatePost";
 import {Tags, loader as tagsLoader} from "./components/Tags";
@@ -77,8 +77,9 @@ const router = createBrowserRouter([
                 loader: tagsLoader,
             },
             {
-                path: "/profile",
-                element: <Profile/>
+                path: "/profile/:userId",
+                element: <Profile/>,
+                loader: profileLoader,
             }
         ]
     },

@@ -32,6 +32,16 @@ class LikesRepository extends ServiceEntityRepository
         return $query->getSingleScalarResult();
     }
 
+    public function findByUserId($userId): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT p.title, p.id AS postId, l.timestamp  FROM App\Entity\Likes l JOIN l.post p
+            WHERE l.user= :userId'
+        )->setParameters(['userId' => $userId]);
+        return $query->getResult();
+    }
+
 //    /**
 //     * @return Likes[] Returns an array of Likes objects
 //     */
