@@ -18,13 +18,13 @@ const formatDate = (dateString) => {
 }
 
 
-
-
 export const Post = ()  => {
     const {post, isFavoriteValue, likes, tags} = useLoaderData();
 
     const [likeNumber, setLikeNumber] = useState(likes);
     const [isFavorite, setIsFavorite] = useState(isFavoriteValue);
+
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const handleLikeClick = async () => {
         //TODO: change userID

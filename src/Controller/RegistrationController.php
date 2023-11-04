@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/api/profile/registration',name: 'register', methods: ['POST'])]
+    #[Route('/api/registration',name: 'register', methods: ['POST'])]
     public function index(UserPasswordHasherInterface $passwordHasher, Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);

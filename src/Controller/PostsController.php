@@ -60,18 +60,17 @@ class PostsController extends AbstractController
         $newPost->setTitle($data['title']);
         $newPost->setContent($data['content']);
         $newPost->setCreatedAt(new \DateTime());
-
-        $user = $entityManager->getRepository( User::class)->find($data['userId']);
+        $user = $this->getUser();
         $newPost->setUser($user);
         $entityManager->persist($newPost);
         $entityManager->flush();
         $id = $newPost->getId();
 
-        return new Response('Saved new product with id '.$newPost->getId());
+        return new JsonResponse(['id' => $id]);
 
     }
 
-    #[Route('/api/posts/update',name: 'createPost', methods: ['PUT'])]
+    #[Route('/api/posts/update',name: 'updatePost', methods: ['PUT'])]
     function updatePost(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);

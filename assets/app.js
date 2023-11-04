@@ -26,6 +26,7 @@ import {Registration} from "./components/Registration";
 import {Login} from "./components/Login";
 import {Layout} from "./components/Layout";
 import {Profile} from "./components/Profile";
+import {NewPost} from "./components/NewPost";
 
 
 
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
                 path: "/posts/:postId",
                 element: <Post/>,
                 loader: postLoader,
+            },
+            {
+                path: "/posts/addPost",
+                element: <NewPost/>,
             },
             {
                 path: "/registration",

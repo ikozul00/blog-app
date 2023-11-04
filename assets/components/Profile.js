@@ -5,7 +5,8 @@ import {useNavigate, useNavigation} from "react-router-dom";
 export const Profile = () => {
     const navigate=useNavigate();
     const handleLogout = async() => {
-        const response = await axios.get("/api/profile/logout");
+        const response = await axios.get("/api/logout");
+        localStorage.clear();
         navigate("/");
     }
 

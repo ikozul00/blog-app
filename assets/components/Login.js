@@ -26,7 +26,7 @@ export const Login= () => {
         }
 
         try {
-            const response = await axios.post("/api/profile/login", {'username': email, 'password': password});
+            const response = await axios.post("/api/login", {'username': email, 'password': password});
             const role = response.data.role.includes('ROLE_ADMIN') ? 'admin' : 'user';
             localStorage.setItem('user',JSON.stringify({'id': response.data.id, 'role':role }));
             navigate("/");
