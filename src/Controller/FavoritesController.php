@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FavoritesController extends AbstractController
 {
-    #[Route('/addToFavorites/{id}', name:'addPostToFavorites', methods:['POST'])]
+    #[Route('/api/addToFavorites/{id}', name:'addPostToFavorites', methods:['POST'])]
     function addToFavorites(Request $request, EntityManagerInterface $entityManager, string $id): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -27,7 +27,7 @@ class FavoritesController extends AbstractController
         return new Response('Saved new favorite with id '.$newFavorite->getId());
     }
 
-    #[Route('/removeFromFavorites/{postId}/{userId}', name:'removeFavorite', methods:['DELETE'])]
+    #[Route('/api/removeFromFavorites/{postId}/{userId}', name:'removeFavorite', methods:['DELETE'])]
     function removeFromFavorites(Request $request, EntityManagerInterface $entityManager, string $userId, string $postId): Response
     {
         $data=json_decode($request->getContent(), true);

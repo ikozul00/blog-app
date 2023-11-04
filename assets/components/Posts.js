@@ -1,16 +1,17 @@
 import React, {useEffect, useState} from "react";
 import ReactDOM from 'react-dom';
+import {Link} from "react-router-dom";
 
 export const Posts = ({}) => {
     const [posts, setPosts] = useState([]);
+
     useEffect( () => {
         const getData = async () =>{
-            const data = await fetch("/posts");
+            const data = await fetch("/api/posts");
             const jsonData= await data.json();
             setPosts(jsonData);
         }
         getData();
-
 
     }, []);
 
@@ -93,12 +94,12 @@ export const Posts = ({}) => {
 
     return (
         <>
-        {posts.map(post => (
-            <div key={post.id}>
-                <a href={`/posts/load/${post.id}`}>{post.title}</a>
-            </div>
-        ))}
-            <button onClick={addFavorite}>Add</button>
+            <h1>Posts</h1>
+            {posts.map(post => (
+                <div key={post.id}>
+                    <Link to={`/posts/${post.id}`} >{post.title}</Link>
+                </div>
+            ))}
         </>
     )
 }

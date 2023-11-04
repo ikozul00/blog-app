@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Favorites;
 use App\Entity\Likes;
 use App\Entity\Post;
 use App\Entity\PostTag;
@@ -17,28 +18,39 @@ use Symfony\Component\Routing\Annotation\Route;
 class PostsController extends AbstractController
 {
 
-    #[Route('/posts',name: 'postsList', methods: ['GET'])]
+    #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
     function fetchPosts(EntityManagerInterface $entityManager): Response
     {
         $posts=$entityManager->getRepository( Post::class)->getPostsList();
         return new JsonResponse($posts);
     }
 
-    #[Route('/posts/load/{id}', methods: ['GET'])]
+    #[Route('/api/posts/{id}', methods: ['GET'])]
     function getPostDetails(EntityManagerInterface $entityManager, string $id):Response
     {
+        $data=[];
         $post=$entityManager->getRepository( Post::class)->getPost($id);
         if (!$post[0]) {
             throw $this->createNotFoundException(
                 'No post found for id '.$id
             );
         }
+        $data['post'] = $post[0];
+        $data['tags'] = $entityManager->getRepository(Tag :: class) ->findByPostId($id);
+        $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($id, 65);
+        if($isFavorite==0){
+            $data['ifFavorite']=false;
+        }
+        else{
+            $data['ifFavorite']=true;
+        }
+        $data['likes']=$entityManager->getRepository(Likes::class)->findByPostId($id);
         // Create a JsonResponse and return it
-        return new JsonResponse($post[0]);
+        return new JsonResponse($data);
 
     }
 
-    #[Route('/posts/create',name: 'createPost', methods: ['POST'])]
+    #[Route('/api/posts/create',name: 'createPost', methods: ['POST'])]
     function createPost(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -58,7 +70,7 @@ class PostsController extends AbstractController
 
     }
 
-    #[Route('/posts/update',name: 'createPost', methods: ['PUT'])]
+    #[Route('/api/posts/update',name: 'createPost', methods: ['PUT'])]
     function updatePost(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -82,7 +94,7 @@ class PostsController extends AbstractController
     }
 
 
-    #[Route('/posts/delete/{id}', name:'deletePost', methods: ['DELETE'])]
+    #[Route('/api/posts/delete/{id}', name:'deletePost', methods: ['DELETE'])]
     function deletePost(EntityManagerInterface $entityManager, string $id): Response
     {
         $numberOfPosts=$entityManager->getRepository( Post::class)->deletePost($id);
@@ -94,7 +106,7 @@ class PostsController extends AbstractController
         return new Response(status: 200);
     }
 
-    #[Route('/posts/addTag', name:'addTag', methods:['POST'])]
+    #[Route('/api/posts/addTag', name:'addTag', methods:['POST'])]
     function addTag(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -111,7 +123,9 @@ class PostsController extends AbstractController
     }
 
 
-    #[Route('/posts/removeTag', name:'removeTag', methods:['DELETE'])]
+
+
+    #[Route('/api/posts/removeTag', name:'removeTag', methods:['DELETE'])]
     function removeTag(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -125,7 +139,7 @@ class PostsController extends AbstractController
         return new Response(status: 200);
     }
 
-    #[Route('/posts/like/{id}', name:'likePost', methods:['POST'])]
+    #[Route('/api/posts/like/{id}', name:'likePost', methods:['POST'])]
     function likePost(Request $request, EntityManagerInterface $entityManager, string $id): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -137,5 +151,7 @@ class PostsController extends AbstractController
         $entityManager->flush();
         return new Response(status: 200);
     }
+
+
 
 }

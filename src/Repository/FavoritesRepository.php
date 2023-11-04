@@ -29,8 +29,17 @@ class FavoritesRepository extends ServiceEntityRepository
             WHERE f.post= :postId AND f.user= :userId'
         )->setParameters(['postId' => $postId, 'userId' => $userId]);
 
-        // returns an array of Product objects
-        return $query->execute();
+        return $query->getResult();
+    }
+
+    public function findByUserAndPostId($postId, $userId): int
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT COUNT(f.id) FROM App\Entity\Favorites f
+            WHERE f.post= :postId AND f.user= :userId'
+        )->setParameters(['postId' => $postId, 'userId' => $userId]);
+        return $query->getSingleScalarResult();
     }
 
 //    /**

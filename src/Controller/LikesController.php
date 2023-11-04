@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class LikesController extends AbstractController
 {
-    #[Route('/likes/{id}', name:'addLikeToPost', methods:['POST'])]
+    #[Route('/api/likes/{id}', name:'addLikeToPost', methods:['POST'])]
     function addLikeToPost(Request $request, EntityManagerInterface $entityManager, string $id): Response
     {
         $data=json_decode($request->getContent(), true);

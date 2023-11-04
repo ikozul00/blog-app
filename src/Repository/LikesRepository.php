@@ -21,6 +21,17 @@ class LikesRepository extends ServiceEntityRepository
         parent::__construct($registry, Likes::class);
     }
 
+    public function findByPostId($id): int
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT COUNT(l.id) FROM App\Entity\Likes l
+            WHERE l.post= :postId '
+        )->setParameters(['postId' => $id]);
+
+        return $query->getSingleScalarResult();
+    }
+
 //    /**
 //     * @return Likes[] Returns an array of Likes objects
 //     */

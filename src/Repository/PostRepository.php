@@ -32,7 +32,6 @@ class PostRepository extends ServiceEntityRepository
             FROM App\Entity\Post p'
         );
 
-        // returns an array of Product objects
         return $query->getResult();
     }
 
@@ -48,15 +47,27 @@ class PostRepository extends ServiceEntityRepository
         return $query->execute();
     }
 
+
     public function getPost($id): Array
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
-            'SELECT p.title, p.content, p.createdAt, p.lastEdited FROM App\Entity\Post p
+            'SELECT p.title, p.content, p.createdAt, p.lastEdited,p.id AS postId, u.username, u.id AS userId 
+            FROM App\Entity\Post p JOIN p.user u
             WHERE p.id= :id'
         )->setParameter('id', $id);
 
-        // returns an array of Product objects
+        return $query->getResult();
+    }
+
+    public function findById($id)
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT p,u,c FROM App\Entity\Post p JOIN 
+            WHERE p.id= :id'
+        )->setParameter('id', $id);
+
         return $query->getResult();
     }
 

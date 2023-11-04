@@ -15,11 +15,13 @@ import './bootstrap';
 import React from "react";
 import ReactDom from 'react-dom';
 import { createRoot } from 'react-dom/client';
-import {Posts} from "./js/Posts";
+import {Posts} from "./components/Posts";
+import {Post, loader as postLoader} from "./components/Post";
 import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom";
+import ErrorPage from "./components/ErrorPage";
 
 
 
@@ -36,7 +38,14 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <App/>,
+        errorElement: <ErrorPage/>,
     },
+    {
+        path: "/posts/:postId",
+        element: <Post/>,
+        loader: postLoader,
+    },
+
 ]);
 
 

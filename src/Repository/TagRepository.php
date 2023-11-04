@@ -33,6 +33,18 @@ class TagRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    public function findByPostId($id): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT t.name, t.id 
+            FROM App\Entity\PostTag d JOIN d.post p JOIN d. tag t WHERE d.post= :id'
+        )->setParameter(key:'id', value:$id);
+
+        // returns an array of Product objects
+        return $query->getResult();
+    }
+
     public function deleteTag($id): int
     {
         $entityManager = $this->getEntityManager();

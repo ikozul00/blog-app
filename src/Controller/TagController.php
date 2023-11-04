@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TagController extends AbstractController
 {
-    #[Route('/tags', name:'tagsList', methods:['GET'])]
+    #[Route('/api/tags', name:'tagsList', methods:['GET'])]
     function getTags(EntityManagerInterface $entityManager): Response
     {
         $tags = $entityManager->getRepository(Tag :: class) ->getTagsList();
@@ -20,7 +20,7 @@ class TagController extends AbstractController
     }
 
 
-    #[Route('/tags/create', name:'createTag', methods:['POST'])]
+    #[Route('/api/tags/create', name:'createTag', methods:['POST'])]
     function createTag(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -33,7 +33,7 @@ class TagController extends AbstractController
         return new Response('Saved new tag with id '.$newTag->getId());
     }
 
-    #[Route('/tags/update', name:'updateTag', methods:['PUT'])]
+    #[Route('/api/tags/update', name:'updateTag', methods:['PUT'])]
     function updateTag(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -53,7 +53,7 @@ class TagController extends AbstractController
     }
 
 
-    #[Route('/tags/delete/{id}', name:'deleteTag', methods:['DELETE'])]
+    #[Route('/api/tags/delete/{id}', name:'deleteTag', methods:['DELETE'])]
     function deleteTag(EntityManagerInterface $entityManager, string $id): Response
     {
        $numberOfDeleted = $entityManager->getRepository(Tag::class) -> deleteTag($id);
@@ -65,4 +65,12 @@ class TagController extends AbstractController
         }
         return new Response(status: 200);
     }
+
+    #[Route('/api/tags/post/{id}', name:'postTags', methods:['GET'])]
+    function getPostTags(EntityManagerInterface $entityManager, string $id): Response
+    {
+        $tags = $entityManager->getRepository(Tag :: class) ->findByPostId($id);
+        return new JsonResponse($tags);
+    }
+
 }
