@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import axios from "axios";
 import {useLoaderData} from "react-router-dom";
 
@@ -18,8 +18,43 @@ const formatDate = (dateString) => {
 }
 
 
+
+
 export const Post = ()  => {
-    const {post, isFavorite, likes, tags} = useLoaderData();
+    const {post, isFavoriteValue, likes, tags} = useLoaderData();
+
+    const [likeNumber, setLikeNumber] = useState(likes);
+    const [isFavorite, setIsFavorite] = useState(isFavoriteValue);
+
+    const handleLikeClick = async () => {
+        //TODO: change userID
+        const response = await axios.post(`/api/likes/${post.postId}`, {userId:64});
+        if(response.status!==200){
+            console.log("Error while adding like.");
+            return 0;
+        }
+        setLikeNumber(likeNumber+1);
+    }
+
+    const handleFavoriteClick = async () => {
+        if(isFavorite) {
+            //TODO: change userID
+            const response = await axios.delete(`/api/removeFromFavorites/${post.postId}/64`);
+            if (response.status !== 200) {
+                console.log("Error while removing from favorites.");
+                return 0;
+            }
+            setIsFavorite(false);
+            return 0;
+        }
+        //TODO: change userID
+        const response = await axios.post(`/api/addToFavorites/${post.postId}`, {userId:64});
+        if (response.status !== 200) {
+            console.log("Error while adding to favorites.");
+            return 0;
+        }
+        setIsFavorite(true);
+    }
 
     return(
         <div>
@@ -39,9 +74,10 @@ export const Post = ()  => {
             </div>
             }
             <div>
-                <span>{likes} </span><button>Like</button>
+                <span>{likeNumber} </span><button onClick={handleLikeClick}>Like</button>
             </div>
-            {isFavorite ? <button>unfavorite</button> : <button>favorite</button>}
+            <button onClick={handleFavoriteClick}>{isFavorite ? "unfavorite" : "favorite"}</button>
+
 
         </div>
     )
