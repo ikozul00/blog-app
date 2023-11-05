@@ -20,7 +20,7 @@ export const formatDate = (dateString) => {
 
 
 export const Post = ()  => {
-    const {post, isFavoriteValue, likes, tags, comments} = useLoaderData();
+    const {post, isFavoriteValue, likes, tags, comments, imageUrl} = useLoaderData();
 
     const [likeNumber, setLikeNumber] = useState(likes);
     const [isFavorite, setIsFavorite] = useState(isFavoriteValue);
@@ -125,6 +125,7 @@ export const Post = ()  => {
     return(
         <div>
             <h2>{post?.title}</h2>
+            {imageUrl!==""  && <img src={imageUrl} alt={"post image"}/>}
             <p>{post?.content}</p>
             <p>by {post?.email}</p>
             <p>Created: {formatDate(post?.createdAt.date)}</p>

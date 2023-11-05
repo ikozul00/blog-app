@@ -9,16 +9,39 @@ use App\Entity\Post;
 use App\Entity\PostTag;
 use App\Entity\Tag;
 use App\Entity\User;
+use App\ImageOptimizer;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class PostsController extends AbstractController
 {
+
+    function storeImage($image, SluggerInterface $slugger, ImageOptimizer $imageOptimizer){
+        $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+        // this is needed to safely include the file name as part of the URL
+        $safeFilename = $slugger->slug($originalFilename);
+        $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+
+        try {
+            $image->move(
+                $this->getParameter('images_directory'),
+                $newFilename
+            );
+            $imageOptimizer->resize($this->getParameter('images_directory') . '/' .$newFilename);
+            return $newFilename;
+        } catch (FileException $e) {
+            throw new \HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, 'An error occurred while uploading a image.');
+        }
+    }
 
     #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
     function fetchPosts(EntityManagerInterface $entityManager): Response
@@ -28,7 +51,7 @@ class PostsController extends AbstractController
     }
 
     #[Route('/api/posts/{id}', methods: ['GET'])]
-    function getPostDetails(EntityManagerInterface $entityManager, string $id):Response
+    function getPostDetails(EntityManagerInterface $entityManager,Packages $assets, string $id):Response
     {
         $data=[];
         $post=$entityManager->getRepository( Post::class)->getPost($id);
@@ -40,6 +63,14 @@ class PostsController extends AbstractController
         $data['post'] = $post[0];
         $data['tags'] = $entityManager->getRepository(Tag :: class) ->findByPostId($id);
         $data['comments'] = $entityManager->getRepository(Comment::class)->findByPostId($id);
+        $imagePath = $data['post']['imagePath'];
+        if($imagePath){
+            $data['imageUrl'] = $assets->getUrl('uploads/postImages/' . $imagePath);
+        }
+        else{
+            $data['imageUrl'] ="";
+        }
+
         $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($id, 65);
         if($isFavorite==0){
             $data['ifFavorite']=false;
@@ -55,16 +86,18 @@ class PostsController extends AbstractController
 
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/create',name: 'createPost', methods: ['POST'])]
-    function createPost(Request $request, EntityManagerInterface $entityManager): Response
+    function createPost(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, ImageOptimizer $imageOptimizer,): Response
     {
-        $data=json_decode($request->getContent(), true);
-
         $newPost = new Post();
-        $newPost->setTitle($data['title']);
-        $newPost->setContent($data['content']);
+        $newPost->setTitle($request->request->get('title'));
+        $newPost->setContent($request->request->get('content'));
         $newPost->setCreatedAt(new \DateTime());
-        $user = $this->getUser();
-        $newPost->setUser($user);
+        $newPost->setUser($this->getUser());
+        $image=$request->files->get('image');
+        if($image) {
+            $imagePath = $this->storeImage($image, $slugger, $imageOptimizer);
+            $newPost->setImagePath($imagePath);
+        }
         $entityManager->persist($newPost);
         $entityManager->flush();
         $id = $newPost->getId();
@@ -73,23 +106,28 @@ class PostsController extends AbstractController
 
     }
 
+    //PUT method would send empty request body, can't find how to send multipart-data with PUT
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/posts/update',name: 'updatePost', methods: ['PUT'])]
-    function updatePost(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/api/posts/update',name: 'updatePost', methods: ['POST'])]
+    function updatePost(Request $request,LoggerInterface $logger, EntityManagerInterface $entityManager, SluggerInterface $slugger, ImageOptimizer $imageOptimizer): Response
     {
-        $data=json_decode($request->getContent(), true);
-
-        $post = $entityManager->getRepository( Post::class)->find($data['id']);
+        $id = $request->request->get('id');
+        $post = $entityManager->getRepository( Post::class)->find($id);
 
         if(!$post){
             throw $this->createNotFoundException(
-                'No post found for id '.$data['id']
+                'No post found for id '.$request->request->get('id')
             );
         }
 
-        $post->setTitle($data['title'] ?? $post->getTitle());
-        $post->setContent($data['content'] ?? $post->getContent());
+        $post->setTitle($request->request->get('title') ?? $post->getTitle());
+        $post->setContent($request->request->get('content') ?? $post->getContent());
         $post->setLastEdited(new \DateTime());
+        $image=$request->files->get('image');
+        if($image) {
+            $imagePath = $this->storeImage($image, $slugger, $imageOptimizer);
+            $post->setImagePath($imagePath);
+        }
 
         $entityManager->flush();
 
@@ -165,7 +203,5 @@ class PostsController extends AbstractController
         $entityManager->flush();
         return new Response(status: 200);
     }
-
-
 
 }
