@@ -6,6 +6,7 @@ export const EditProfileForm= ({emailData="", usernameData="", passwordData="", 
     const [oldPassword, setOldPassword] = useState("");
     const [password, setPassword] = useState(passwordData);
     const [repeatPassword, setRepeatPassword] = useState("");
+    const [image, setImage] = useState(null);
     const [error, setError] = useState("");
 
     const handleEmail = (e) => {
@@ -37,7 +38,12 @@ export const EditProfileForm= ({emailData="", usernameData="", passwordData="", 
             setError("Passwords do not match.");
             return;
         }
-        handleData({email, username, password, setError, oldPassword});
+        handleData({email, username, password,image, setError, oldPassword});
+    }
+
+    const handleImageUpload =  (e) => {
+        setImage(e.target.files[0]);
+
     }
 
 
@@ -62,6 +68,11 @@ export const EditProfileForm= ({emailData="", usernameData="", passwordData="", 
                 <label className="label">Repeat Password</label>
                 <input onChange={handleRepeatPassword}
                        value={repeatPassword} type="password" /><br/>
+                <label className="label">Image</label>
+                <input
+                    type="file"
+                    name="myImage"
+                    onChange={handleImageUpload}/>
                 {error && <p>{error}</p>}
                 <button onClick={handleSubmit}
                         type="submit">

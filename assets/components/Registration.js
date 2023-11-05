@@ -8,7 +8,12 @@ export const Registration= () => {
 
 
     const handleData = async (user) =>{
-        const response =await  axios.post("/api/registration", {'email': user.email, 'password':user.password, 'username':user.username});
+        const formData = new FormData();
+        formData.append('email', user.email);
+        formData.append('password', user.password);
+        formData.append('username', user.username);
+        formData.append('image', user.image);
+        const response =await  axios.post("/api/registration", formData);
         if(response.data==="User exists."){
             user.setError("User with this email already exists.");
             return;

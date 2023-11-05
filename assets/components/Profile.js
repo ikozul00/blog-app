@@ -17,11 +17,13 @@ export const Profile = () => {
     const navigate=useNavigate();
     let {userId} = useParams();
     const loggedUser = JSON.parse(localStorage.getItem('user'));
+    const params = useParams();
     const {user, favorites, comments, likes} = useLoaderData();
 
     const [isEditable, setIsEditable] = useState(false);
     const [email, setEmail] = useState(user.email);
     const [username, setUsername] = useState(user.username);
+    const [image, setImage] = useState(user.image);
 
     const handleLogout = async() => {
         const response = await axios.get("/api/logout");
@@ -31,8 +33,13 @@ export const Profile = () => {
 
     const handleUpdating = async (userData) => {
         try {
-            const response = await axios.put(`/api/profile/update/${userId}`,
-                {'email': userData.email, 'password': userData.password, 'username': userData.username, 'oldPassword':userData.oldPassword});
+            const formData = new FormData();
+            formData.append('email', userData.email);
+            formData.append('password', userData.password);
+            formData.append('oldPassword', userData.oldPassword);
+            formData.append('username', userData.username);
+            formData.append('image', userData.image);
+            const response = await axios.post(`/api/profile/update/${userId}`, formData);
             if(response.data === 'Wrong password.'){
                 userData.setError("Problem while updating password");
                 return;
@@ -41,17 +48,19 @@ export const Profile = () => {
                 userData.setError("User with this email already exists.");
                 return;
             }
+            const responseUser = await axios.get(`/api/profile/${params.userId}`);
             setIsEditable(false);
-            setEmail(userData.email);
-            setUsername(userData.username);
+            setEmail(responseUser.data.user.email);
+            setUsername(responseUser.data.user.username);
+            setImage(responseUser.data.user.image);
         }
         catch(error){
             if (error.response) {
-                user.setError(error.response.data);
+                userData.setError(error.response.data);
             } else if (error.request) {
-                user.setError(error.request.data);
+                userData.setError(error.request.data);
             } else {
-                user.setError('Error', error.message);
+                userData.setError('Error', error.message);
             }
         }
     }
@@ -75,8 +84,7 @@ export const Profile = () => {
             }
         }
     }
-
-    console.log((user.id ===userId) || (user.role==="admin"));
+    console.log(image);
     return(
         <div>
             <button onClick={handleLogout}>Logout</button>
@@ -85,9 +93,10 @@ export const Profile = () => {
             {!isEditable && <div>
                 <p>Email: {email}</p>
                 <p>Username: {username}</p>
+                {image!=="" && <img src={image} alt={"user image"}/>}
                 <button onClick={handleFormVisibility}>Edit</button>
             </div>}
-            {isEditable && ((user.id ===userId) || (loggedUser.role==="admin")) && <EditProfileForm handleData={handleUpdating} emailData={user.email} usernameData={user.username}/>}
+            {isEditable && ((user.id ==userId) || (loggedUser.role==="admin")) && <EditProfileForm handleData={handleUpdating} emailData={user.email} usernameData={user.username}/>}
             <p>Favorites</p>
             {favorites.map(favorite => <Link to={`/posts/${favorite.postId}`} key={favorite.postId}>{favorite.title}</Link>)}
             <h4>Activity</h4>

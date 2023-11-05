@@ -3,7 +3,7 @@ import axios from "axios";
 import { useLoaderData, useNavigate} from "react-router-dom";
 
 export const UpdatePost= () => {
-    const {post} = useLoaderData();
+    const {post, imageUrl} = useLoaderData();
 
     const [title, setTitle] = useState(post?.title || "");
     const [image, setImage] = useState(post?.image || "");
@@ -72,6 +72,10 @@ export const UpdatePost= () => {
                 <label className="label">Content</label>
                 <textarea onChange={handleContent}
                           value={content}  ></textarea><br/>
+                { imageUrl!==""  && <div>
+                <p>Current image</p>
+                    <img src={imageUrl} alt={"post image"}/>
+                </div>}
                 <label className="label">Image</label>
                 <input
                     type="file"

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\CommonFunctions;
 use App\Entity\Comment;
 use App\Entity\Favorites;
 use App\Entity\Likes;
@@ -14,7 +15,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,24 +24,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class PostsController extends AbstractController
 {
-
-    function storeImage($image, SluggerInterface $slugger, ImageOptimizer $imageOptimizer){
-        $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-        // this is needed to safely include the file name as part of the URL
-        $safeFilename = $slugger->slug($originalFilename);
-        $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
-
-        try {
-            $image->move(
-                $this->getParameter('images_directory'),
-                $newFilename
-            );
-            $imageOptimizer->resize($this->getParameter('images_directory') . '/' .$newFilename);
-            return $newFilename;
-        } catch (FileException $e) {
-            throw new \HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, 'An error occurred while uploading a image.');
-        }
-    }
 
     #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
     function fetchPosts(EntityManagerInterface $entityManager): Response
@@ -86,7 +68,7 @@ class PostsController extends AbstractController
 
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/create',name: 'createPost', methods: ['POST'])]
-    function createPost(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, ImageOptimizer $imageOptimizer,): Response
+    function createPost(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, ImageOptimizer $imageOptimizer, CommonFunctions $commonFunctions): Response
     {
         $newPost = new Post();
         $newPost->setTitle($request->request->get('title'));
@@ -95,7 +77,7 @@ class PostsController extends AbstractController
         $newPost->setUser($this->getUser());
         $image=$request->files->get('image');
         if($image) {
-            $imagePath = $this->storeImage($image, $slugger, $imageOptimizer);
+            $imagePath = $commonFunctions->storeImage($image, $slugger, $imageOptimizer, true);
             $newPost->setImagePath($imagePath);
         }
         $entityManager->persist($newPost);
@@ -109,7 +91,7 @@ class PostsController extends AbstractController
     //PUT method would send empty request body, can't find how to send multipart-data with PUT
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/update',name: 'updatePost', methods: ['POST'])]
-    function updatePost(Request $request,LoggerInterface $logger, EntityManagerInterface $entityManager, SluggerInterface $slugger, ImageOptimizer $imageOptimizer): Response
+    function updatePost(Request $request,LoggerInterface $logger, EntityManagerInterface $entityManager, SluggerInterface $slugger, ImageOptimizer $imageOptimizer, CommonFunctions $commonFunctions): Response
     {
         $id = $request->request->get('id');
         $post = $entityManager->getRepository( Post::class)->find($id);
@@ -125,7 +107,7 @@ class PostsController extends AbstractController
         $post->setLastEdited(new \DateTime());
         $image=$request->files->get('image');
         if($image) {
-            $imagePath = $this->storeImage($image, $slugger, $imageOptimizer);
+            $imagePath = $commonFunctions->storeImage($image, $slugger, $imageOptimizer, true);
             $post->setImagePath($imagePath);
         }
 
