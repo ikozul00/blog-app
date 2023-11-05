@@ -18,9 +18,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class UserController extends AbstractController
 {
     #[Route('/api/profile/{id}',name: 'getUser', methods: ['GET'])]
-    function fetchUser(EntityManagerInterface $entityManager, string $id): Response
+    #[IsGranted('owner', subject: 'user')]
+    function fetchUser(EntityManagerInterface $entityManager, User $user): Response
     {
-        $user=$entityManager->getRepository( User::class)->find($id);
+        $id=$user->getId();
         $userJson = ['id' => $user->getId(), 'email' => $user ->getEmail(), 'username' => $user->getUsername()];
         $comments = $entityManager -> getRepository(Comment::class) -> findByUserId($id);
         $favorites = $entityManager -> getRepository(Favorites:: class) ->findByUserId($id);
@@ -29,6 +30,7 @@ class UserController extends AbstractController
         return new JsonResponse($data);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/profiles',name: 'getUsers', methods: ['GET'])]
     function fetchUsers(EntityManagerInterface $entityManager): Response
     {
@@ -36,12 +38,12 @@ class UserController extends AbstractController
         return new JsonResponse($users);
     }
 
-    #[Route('/api/profile/update',name: 'updateProfile', methods: ['PUT'])]
-    function updatePost(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+
+    #[Route('/api/profile/update/{id}',name: 'updateProfile', methods: ['PUT'])]
+    #[IsGranted('owner', subject: 'user')]
+    function updatePost(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
         $data=json_decode($request->getContent(), true);
-
-        $user = $entityManager->getRepository( User::class)->find($data['id']);
 
         if(!$user){
             throw $this->createNotFoundException(
@@ -71,6 +73,7 @@ class UserController extends AbstractController
         return new Response('Updated user with id '.$user->getId());
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/profile/delete/{id}', name:'deleteUser', methods: ['DELETE'])]
     function deleteUser(EntityManagerInterface $entityManager, string $id): Response
     {
