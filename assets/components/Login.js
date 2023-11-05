@@ -6,6 +6,7 @@ export const Login= () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [isChecked, setIsChecked] = useState("");
 
     const navigate = useNavigate();
 
@@ -16,6 +17,10 @@ export const Login= () => {
     const handlePassword = (e) => {
         setPassword(e.target.value);
     };
+    const handleCheckbox = (e) => {
+        setIsChecked(e.target.value);
+    };
+
 
 
     const handleSubmit = async (e) =>{
@@ -26,7 +31,14 @@ export const Login= () => {
         }
 
         try {
-            const response = await axios.post("/api/login", {'username': email, 'password': password});
+            let body={};
+            if(isChecked){
+                body={'username': email, 'password': password,  "_remember_me": true};
+            }
+            else{
+                body={'username': email, 'password': password };
+            }
+            const response = await axios.post("/api/login", body);
             const role = response.data.role.includes('ROLE_ADMIN') ? 'admin' : 'user';
             localStorage.setItem('user',JSON.stringify({'id': response.data.id, 'role':role }));
             navigate("/");
@@ -53,12 +65,18 @@ export const Login= () => {
             <form>
                 <label className="label">Email</label>
                 <input onChange={handleEmail}
-                       value={email} type="email" />
+                       value={email} type="email" /><br/>
 
                 <label className="label">Password</label>
                 <input onChange={handlePassword}
-                       value={password} type="password" />
-
+                       value={password} type="password" /><br/>
+                <label>
+                <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={handleCheckbox}
+                /> Remember Me
+                </label><br/>
                 {error && <p>{error}</p>}
                 <button onClick={handleSubmit}
                         type="submit">
