@@ -25,6 +25,9 @@ export const Layout = () => {
                 {user && <li>
                     <Link to={`/profile/${user.id}`}>Profile</Link>
                 </li>}
+                {user && <li>
+                    <Link to={`/profiles`}>Users</Link>
+                </li>}
 
             </ul>
         </nav>

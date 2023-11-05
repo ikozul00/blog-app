@@ -28,6 +28,7 @@ import {Profile, loader as profileLoader} from "./components/Profile";
 import {NewPost} from "./components/NewPost";
 import {UpdatePost} from "./components/UpdatePost";
 import {Tags, loader as tagsLoader} from "./components/Tags";
+import {Users, loader as usersLoader} from "./components/Users";
 
 
 const App = () => {
@@ -80,6 +81,11 @@ const router = createBrowserRouter([
                 path: "/profile/:userId",
                 element: <Profile/>,
                 loader: profileLoader,
+            },
+            {
+                path: "/profiles",
+                element: <Users/>,
+                loader: usersLoader,
             }
         ]
     },

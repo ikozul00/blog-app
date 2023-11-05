@@ -9,13 +9,16 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class UserController extends AbstractController
 {
-    #[Route('/api/user/{id}',name: 'getUser', methods: ['GET'])]
-    function fetchPosts(EntityManagerInterface $entityManager, string $id): Response
+    #[Route('/api/profile/{id}',name: 'getUser', methods: ['GET'])]
+    function fetchUser(EntityManagerInterface $entityManager, string $id): Response
     {
         $user=$entityManager->getRepository( User::class)->find($id);
         $userJson = ['id' => $user->getId(), 'email' => $user ->getEmail(), 'username' => $user->getUsername()];
@@ -24,5 +27,59 @@ class UserController extends AbstractController
         $likes = $entityManager -> getRepository(Likes:: class) ->findByUserId($id);
         $data=['user' => $userJson, 'comments' => $comments, 'favorites' => $favorites, 'likes' => $likes];
         return new JsonResponse($data);
+    }
+
+    #[Route('/api/profiles',name: 'getUsers', methods: ['GET'])]
+    function fetchUsers(EntityManagerInterface $entityManager): Response
+    {
+        $users=$entityManager->getRepository( User::class)->getUsersList();
+        return new JsonResponse($users);
+    }
+
+    #[Route('/api/profile/update',name: 'updateProfile', methods: ['PUT'])]
+    function updatePost(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $data=json_decode($request->getContent(), true);
+
+        $user = $entityManager->getRepository( User::class)->find($data['id']);
+
+        if(!$user){
+            throw $this->createNotFoundException(
+                'No user found for id '.$data['id']
+            );
+        }
+        //check if old password is ok
+        if($data['password'] !== "" && !$passwordHasher->isPasswordValid($user, $data['oldPassword'])){
+            return new Response('Wrong password.');
+        }
+        //check if user with new email already exists
+        $isExist = $entityManager->getRepository(User::class) ->count(['email'=>$data['email']]);
+        if($isExist !== 0){
+            return new Response("User exists.");
+        }
+
+        $user->setEmail($data['email'] ?? $user->getEmail());
+        $user->setUsername($data['username'] ?? $user->getUsername());
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $data['password']
+        );
+        $user->setPassword($hashedPassword);
+
+        $entityManager->flush();
+
+        return new Response('Updated user with id '.$user->getId());
+    }
+
+    #[Route('/api/profile/delete/{id}', name:'deleteUser', methods: ['DELETE'])]
+    function deleteUser(EntityManagerInterface $entityManager, string $id): Response
+    {
+        $numberOfDeleted=$entityManager->getRepository( USer::class)->deleteUser($id);
+        if($numberOfDeleted==0){
+            throw $this->createNotFoundException(
+                'No user found for id '.$id
+            );
+        }
+        return new Response(status: 200);
     }
 }

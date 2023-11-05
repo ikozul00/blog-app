@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import axios from "axios";
-import {Link, useLoaderData, useNavigate, useNavigation} from "react-router-dom";
+import {Link, useLoaderData, useNavigate, useNavigation, useParams} from "react-router-dom";
 import {formatDate} from "./Post";
+import {EditProfileForm} from "./EditProfileForm";
 
 export const loader = async ({params}) => {
-    const response = await axios.get(`/api/user/${params.userId}`);
+    const response = await axios.get(`/api/profile/${params.userId}`);
     if(response.status !== 200){
         return{error: "Error while fetching post data."}
     }
@@ -14,21 +15,77 @@ export const loader = async ({params}) => {
 
 export const Profile = () => {
     const navigate=useNavigate();
+    let {userId} = useParams();
     const {user, favorites, comments, likes} = useLoaderData();
+
+    const [isEditable, setIsEditable] = useState(false);
+    const [email, setEmail] = useState(user.email);
+    const [username, setUsername] = useState(user.username);
 
     const handleLogout = async() => {
         const response = await axios.get("/api/logout");
         localStorage.clear();
         navigate("/");
     }
-    console.log(likes);
+
+    const handleUpdating = async (userData) => {
+        try {
+            const response = await axios.put("/api/profile/update",
+                {'id':userId,'email': userData.email, 'password': userData.password, 'username': userData.username, 'oldPassword':userData.oldPassword});
+            if(response.data === 'Wrong password.'){
+                userData.setError("Problem while updating password");
+                return;
+            }
+            if(response.data==="User exists."){
+                userData.setError("User with this email already exists.");
+                return;
+            }
+            setIsEditable(false);
+            setEmail(userData.email);
+            setUsername(userData.username);
+        }
+        catch(error){
+            if (error.response) {
+                user.setError(error.response.data);
+            } else if (error.request) {
+                user.setError(error.request.data);
+            } else {
+                user.setError('Error', error.message);
+            }
+        }
+    }
+
+    const handleFormVisibility = () => {
+        setIsEditable(true);
+    }
+
+    const handleDeleteProfile = async () => {
+        try {
+            const response = await axios.delete(`/api/profile/delete/${userId}`);
+            navigate("/profiles");
+        }
+        catch(error){
+            if (error.response) {
+                console.log(error.response);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+        }
+    }
 
     return(
         <div>
             <button onClick={handleLogout}>Logout</button>
             <h2>Profile</h2>
-            <p>Email: {user.email}</p>
-            <p>Username: {user.username}</p>
+            <button onClick={handleDeleteProfile}>Delete</button>
+            {!isEditable && <div>
+                <p>Email: {email}</p>
+                <p>Username: {username}</p>
+                <button onClick={handleFormVisibility}>Edit</button>
+            </div>}
+            {isEditable && <EditProfileForm handleData={handleUpdating} emailData={user.email} usernameData={user.username}/>}
             <p>Favorites</p>
             {favorites.map(favorite => <Link to={`/posts/${favorite.postId}`}>{favorite.title}</Link>)}
             <h4>Activity</h4>
