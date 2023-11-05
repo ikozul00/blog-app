@@ -14,7 +14,6 @@ export const loader = async ({params}) => {
 }
 
 export const formatDate = (dateString) => {
-    console.log(dateString);
     const date = new Date(dateString);
     return date.toLocaleDateString();
 }
@@ -156,9 +155,9 @@ export const Post = ()  => {
             </div>
             {user && <button onClick={handleFavoriteClick}>{isFavorite ? "unfavorite" : "favorite"}</button>}
             <br/>
-            {user && <button onClick={handleDeletePost}> Delete Post</button>}
+            {user && user.role==="admin" && <button onClick={handleDeletePost}> Delete Post</button>}
             <br/>
-            {user && <button onClick={handleUpdatePost}> Update Post</button>}
+            {user && user.role==="admin" && <button onClick={handleUpdatePost}> Update Post</button>}
             <div>
                 <h3>Comments</h3>
                 <Comments commentsData={comments} postId={post.postId}></Comments>

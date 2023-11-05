@@ -69,7 +69,7 @@ export const Comments = ({commentsData, postId}) => {
                     <p>{comment?.content}</p>
                     <p>by {comment?.email}</p>
                     <p>created: {formatDate(comment?.createdAt.date)}</p>
-                    {user && user.id === comment.userId &&  <button onClick={() => handleDelete(comment.commentId)}>Delete comment</button>}
+                    {user && (user.id == comment.userId || user.role==="admin") &&  <button onClick={() => handleDelete(comment.commentId)}>Delete comment</button>}
                     <hr/>
                 </div>
                 )

@@ -53,14 +53,13 @@ export const Tags = () => {
 
     return(
         <div>
-            <hr/>
-            {tags.map(tag => <Tag name={tag.name} id={tag.id} tags={tags} setTags={setTags}></Tag>)}
+
             {!isVisible && user && user.role==='admin' && <button onClick={handleAddTagForm}>Add tag</button>}
             {isVisible &&
                 <form>
                     <label className="label">Name</label>
                     <input onChange={handleName}
-                              value={name} type={"text"}/>
+                           value={name} type={"text"}/>
                     {error && <p>error</p>}
                     <button onClick={handleAdding}
                             type="submit">
@@ -68,6 +67,9 @@ export const Tags = () => {
                     </button>
 
                 </form>}
+            <hr/>
+            {tags.map(tag => <Tag name={tag.name} id={tag.id} tags={tags} setTags={setTags}></Tag>)}
+
         </div>
     )
 

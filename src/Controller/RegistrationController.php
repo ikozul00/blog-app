@@ -17,7 +17,6 @@ class RegistrationController extends AbstractController
     {
         $data=json_decode($request->getContent(), true);
 
-
         $isExist = $entityManager->getRepository(User::class) ->count(['email'=>$data['email']]);
         if($isExist !== 0){
             return new Response("User exists.");

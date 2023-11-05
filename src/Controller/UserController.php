@@ -22,7 +22,8 @@ class UserController extends AbstractController
     function fetchUser(EntityManagerInterface $entityManager, User $user): Response
     {
         $id=$user->getId();
-        $userJson = ['id' => $user->getId(), 'email' => $user ->getEmail(), 'username' => $user->getUsername()];
+
+        $userJson = ['id' => $id, 'email' => $user ->getEmail(), 'username' => $user->getUsername(), 'roles' => $user->getRoles()];
         $comments = $entityManager -> getRepository(Comment::class) -> findByUserId($id);
         $favorites = $entityManager -> getRepository(Favorites:: class) ->findByUserId($id);
         $likes = $entityManager -> getRepository(Likes:: class) ->findByUserId($id);
@@ -55,9 +56,11 @@ class UserController extends AbstractController
             return new Response('Wrong password.');
         }
         //check if user with new email already exists
-        $isExist = $entityManager->getRepository(User::class) ->count(['email'=>$data['email']]);
-        if($isExist !== 0){
-            return new Response("User exists.");
+        if($data['email'] !== $user->getEmail()) {
+            $isExist = $entityManager->getRepository(User::class)->count(['email' => $data['email']]);
+            if ($isExist !== 0) {
+                return new Response("User exists.");
+            }
         }
 
         $user->setEmail($data['email'] ?? $user->getEmail());

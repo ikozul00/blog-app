@@ -13,6 +13,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TagController extends AbstractController
 {
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/tags', name:'tagsList', methods:['GET'])]
     function getTags(EntityManagerInterface $entityManager): Response
     {

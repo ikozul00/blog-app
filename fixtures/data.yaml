@@ -1,20 +1,30 @@
 App\Entity\Tag:
   tag_{1..10}:
-    name: '<realText(60, 2)>'
+    name: '<realText(20, 2)>'
+
+App\Entity\User:
+  user_1:
+    username: 'ivana'
+    email : 'ivana@gmail.com'
+    password: '<hashedPassword(@user_1)>'
+    roles: ['ROLE_ADMIN']
+  user_{2..10}:
+    username: '<username()>'
+    email : '<email()>'
+    password: '<hashedPassword(@user_2)>'
+    roles: [ 'ROLE_USER' ]
 
 App\Entity\Post:
   post_{1..10}:
     title: '<realText(60, 2)>'
     content: '<realTextBetween(160, 300, 2)>'
     createdAt: '<dateTimeBetween("-100 days", "now")>'
-    lastEdited: '<dateTimeBetween($createdAt, "now")>'
     user: '@user*'
 
 App\Entity\Comment:
   comment_{1..10}:
     content: '<realTextBetween(160, 300, 2)>'
     createdAt: '<dateTimeBetween("-100 days", "now")>'
-    lastEdited: '<dateTimeBetween($createdAt, "now")>'
     user: '@user*'
     post: '@post*'
 

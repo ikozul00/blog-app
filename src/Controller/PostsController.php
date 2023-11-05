@@ -112,6 +112,7 @@ class PostsController extends AbstractController
     }
 
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/addTag', name:'addTag', methods:['POST'])]
     function addTag(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -136,6 +137,7 @@ class PostsController extends AbstractController
 
 
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/removeTag', name:'removeTag', methods:['DELETE'])]
     function removeTag(Request $request, EntityManagerInterface $entityManager): Response
     {
