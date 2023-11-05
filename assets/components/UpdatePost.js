@@ -6,6 +6,7 @@ export const UpdatePost= () => {
     const {post} = useLoaderData();
 
     const [title, setTitle] = useState(post?.title || "");
+    const [image, setImage] = useState(post?.image || "");
     const [content, setContent] = useState(post?.content || "");
     const [error, setError] = useState("");
 
@@ -20,6 +21,11 @@ export const UpdatePost= () => {
         setContent(e.target.value);
     };
 
+    const handleImageUpload =  (e) => {
+        setImage(e.target.files[0]);
+
+    }
+
 
     const handleSubmit = async (e) =>{
         e.preventDefault();
@@ -29,10 +35,17 @@ export const UpdatePost= () => {
         }
 
         try {
-            const response = await axios.put("/api/posts/update", {'id': post.postId, 'title': title, 'content': content});
+            const formData = new FormData();
+            formData.append('id', post.postId);
+            formData.append('title', title);
+            formData.append('content', content);
+            formData.append('image', image);
+
+            const response = await axios.post("/api/posts/update", formData);
             if(response.status===200){
                 navigate(`/posts/${post.postId}`);
             }
+            console.log(response);
         }
         catch(error){
             if (error.response) {
@@ -54,11 +67,16 @@ export const UpdatePost= () => {
             <form>
                 <label className="label">Title</label>
                 <input onChange={handleTitle}
-                       value={title} type="text" />
+                       value={title} type="text" /><br/>
 
                 <label className="label">Content</label>
                 <textarea onChange={handleContent}
-                          value={content}  ></textarea>
+                          value={content}  ></textarea><br/>
+                <label className="label">Image</label>
+                <input
+                    type="file"
+                    name="myImage"
+                    onChange={handleImageUpload}/>
 
                 {error && <p>{error}</p>}
                 <button onClick={handleSubmit}

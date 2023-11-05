@@ -1,10 +1,11 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {redirect, useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 export const NewPost= () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [image, setImage] = useState(null);
     const [error, setError] = useState("");
 
     const navigate = useNavigate();
@@ -26,7 +27,11 @@ export const NewPost= () => {
         }
 
         try {
-            const response = await axios.post("/api/posts/create", {'title': title, 'content': content});
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('content', content);
+            formData.append('image', image);
+            const response = await axios.post("/api/posts/create", formData);
             if(response.status===200){
                 navigate(`/posts/${response.data.id}`);
             }
@@ -44,6 +49,11 @@ export const NewPost= () => {
 
     }
 
+    const handleImageUpload =  (e) => {
+        setImage(e.target.files[0]);
+
+    }
+
 
     return(
         <div>
@@ -51,11 +61,16 @@ export const NewPost= () => {
             <form>
                 <label className="label">Title</label>
                 <input onChange={handleTitle}
-                       value={title} type="text" />
+                       value={title} type="text" /><br/>
 
                 <label className="label">Content</label>
                 <textarea onChange={handleContent}
-                          value={content}  ></textarea>
+                          value={content}  ></textarea><br/>
+                <label className="label">Image</label>
+                <input
+                    type="file"
+                    name="myImage"
+                    onChange={handleImageUpload}/>
 
                 {error && <p>{error}</p>}
                 <button onClick={handleSubmit}
