@@ -31,8 +31,8 @@ export const NewPost= () => {
             formData.append('title', title);
             formData.append('content', content);
             formData.append('image', image);
-            const response = await axios.post("/api/posts/create", formData);
-            if(response.status===200){
+            const response = await axios.post("/api/post", formData);
+            if(response.status===201){
                 navigate(`/post/en/${response.data.id}`);
             }
         }

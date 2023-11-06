@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class CommentController extends AbstractController
 {
     #[Route('/api/comment',name: 'createComment', methods: ['POST'])]
-    function createComment(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
+    function createComment(Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         try {
@@ -39,6 +39,7 @@ class CommentController extends AbstractController
         }
 
         // TODO: send email on new comment to admin, this code should work, but I don't have SMTP server or configurated provider
+//        MailerInterface $mailer - add to arguments
 //        $users = $entityManager->getRepository(User::class) -> findAll();
 //        $admins = array_filter($users, function(User $user) {
 //            return in_array('ROLE_ADMIN', $user->getRoles());

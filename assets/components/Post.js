@@ -52,10 +52,11 @@ export const Post = ()  => {
 
     const handleLikeClick = async () => {
         const response = await axios.post(`/api/like`, {postId:post.postId});
-        if(response.status!==200){
+        if(response.status!==201){
             console.log("Error while adding like.");
             return 0;
         }
+        console.log(response);
         setLikeNumber(likeNumber+1);
     }
 
@@ -70,7 +71,7 @@ export const Post = ()  => {
             return 0;
         }
         const response = await axios.post(`/api/favorite`, {'postId':post.postId});
-        if (response.status !== 200) {
+        if (response.status !== 201) {
             console.log("Error while adding to favorites.");
             return 0;
         }

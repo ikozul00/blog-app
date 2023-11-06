@@ -47,7 +47,9 @@ class TagController extends AbstractController
                 'No tag found for id '.$data['id']
             );
         }
-
+        if($data['name'] === $tag->getName()){
+            return new JsonResponse(['message' => 'Enter new tag name.'], 400);
+        }
         $tag->setName($data['name'] ?? $tag->getName());
 
         $entityManager->flush();

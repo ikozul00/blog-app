@@ -79,13 +79,14 @@ export const Posts = ({}) => {
         loadMorePosts([], 1);
     }
 
-    const handleLanguageChange = () =>{
-        navigation('/hr');
+    const handleLanguageChange = (lang) =>{
+        navigation(`/${lang}`);
     }
 
     return (
         <>
-            <button onClick={handleLanguageChange}>Hrvatski</button>
+            <button onClick={() => handleLanguageChange('hr')}>Hrvatski</button>
+            <button onClick={() => handleLanguageChange('en')}>English</button>
             <h1>{title}</h1>
             <input type={"text"} value={filter} name={"filter"} id={"filter"}
                    onChange={(e) => setFilter(e.target.value)}/>

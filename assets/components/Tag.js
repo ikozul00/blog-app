@@ -8,7 +8,7 @@ export const Tag = ({id, name, tags, setTags}) => {
 
     const user = JSON.parse(localStorage.getItem('user'));
 
-    const handleDelete = async (id) => {
+    const handleDelete = async () => {
         try {
             const response = await axios.delete(`/api/tag/${id}`);
             const newTags = tags.filter(tag => tag.id!==id);
@@ -48,7 +48,8 @@ export const Tag = ({id, name, tags, setTags}) => {
         }
         catch(error){
             if (error.response) {
-                setError(error.response.data);
+                    setError(error.response.data.message);
+
             } else if (error.request) {
                 setError(error.request.data);
             } else {
@@ -69,7 +70,7 @@ export const Tag = ({id, name, tags, setTags}) => {
                     <label className="label">Name</label>
                     <input onChange={handleName}
                            value={newName} type={"text"}/>
-                    {error && <p>error</p>}
+                    {error && <p>{error}</p>}
                     <button onClick={handleSaveChange}
                             type="submit">
                         Save

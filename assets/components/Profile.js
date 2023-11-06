@@ -132,13 +132,13 @@ export const Profile = () => {
             </div>}
             {isEditable && ((user.id ==userId) || (loggedUser.role==="admin")) && <EditProfileForm handleData={handleUpdating} emailData={user.email} usernameData={user.username}/>}
             <p>Favorites</p>
-            {favorites.map(favorite => <Link to={`/post/${favorite.postId}`} key={favorite.postId}>{favorite.title}</Link>)}
+            {favorites.map(favorite => <Link to={`/post/en/${favorite.postId}`} key={favorite.postId}>{favorite.title}</Link>)}
             <h4>Activity</h4>
             <h5>Comments</h5>
             {commentsList.map(comment =>
                 <div key={comment.commentId}>
                     <hr/>
-                    <p>At post: <Link to={`/post/${comment.postId}`}>{comment.title}</Link></p>
+                    <p>At post: <Link to={`/post/en/${comment.postId}`}>{comment.title}</Link></p>
                     <p>{comment.content}</p>
                     <p>Created at: {formatDate(comment.createdAt.date)}</p>
                     <button onClick={() => handleDeleteComment(comment.commentId)}>Delete comment</button>
@@ -148,7 +148,7 @@ export const Profile = () => {
             {likes.map(like =>
                 <div key={likes.postId}>
                     <hr/>
-                    <p>At post: <Link to={`/post/${like.postId}`}>{like.title}</Link></p>
+                    <p>At post: <Link to={`/post/en/${like.postId}`}>{like.title}</Link></p>
                     <p>Created at: {formatDate(like.timestamp?.date)}</p>
                     <hr/>
                 </div>)}
