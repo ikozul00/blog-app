@@ -10,7 +10,7 @@ export const Tag = ({id, name, tags, setTags}) => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete(`/api/tags/delete/${id}`);
+            const response = await axios.delete(`/api/tag/${id}`);
             const newTags = tags.filter(tag => tag.id!==id);
             setTags(newTags);
         }
@@ -41,7 +41,7 @@ export const Tag = ({id, name, tags, setTags}) => {
         }
 
         try {
-            const response = await axios.put("/api/tags/update", {'name': newName, 'id':id});
+            const response = await axios.put("/api/tag", {'name': newName, 'id':id});
             const newTags = tags.filter(tag => tag.id!== id);
             setTags([...newTags, {id:id, name: newName}]);
             setIsVisible(false);

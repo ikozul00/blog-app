@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class HomeController extends AbstractController
 {
     #[Route('/')]
-    function getPage():Response
+    function getFirstPage():Response
     {
         return $this->render('blog/index.html.twig');
     }

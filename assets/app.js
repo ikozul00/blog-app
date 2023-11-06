@@ -32,7 +32,6 @@ import {Users, loader as usersLoader} from "./components/Users";
 
 
 const App = () => {
-    console.log("Component rendered");
     return(
         <div>
             <Posts/>
@@ -58,11 +57,11 @@ const router = createBrowserRouter([
                 loader: postLoader,
             },
             {
-                path: "/posts/addPost",
+                path: "/posts/add",
                 element: <NewPost/>,
             },
             {
-                path: "/post/updatePost/:postId",
+                path: "/post/update/:postId",
                 element: <UpdatePost/>,
                 loader: postLoader,
             },

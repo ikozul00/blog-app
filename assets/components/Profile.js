@@ -40,14 +40,29 @@ export const Profile = () => {
             formData.append('oldPassword', userData.oldPassword);
             formData.append('username', userData.username);
             formData.append('image', userData.image);
-            const response = await axios.post(`/api/profile/update/${userId}`, formData);
-            if(response.data === 'Wrong password.'){
-                userData.setError("Problem while updating password");
-                return;
+            try {
+                const response = await axios.post(`/api/profile/${userId}`, formData);
+
             }
-            if(response.data==="User exists."){
-                userData.setError("User with this email already exists.");
-                return;
+            catch(error)
+            {
+                if (error.response) {
+                    console.log(error.response);
+                    if(error.response.status===400){
+                        if (error.response.data === 'Wrong password.') {
+                            userData.setError("Problem while updating password");
+                            return;
+                        }
+                        if (error.response.data === "User exists.") {
+                            userData.setError("User with this email already exists.");
+                            return;
+                        }
+                    }
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log('Error', error.message);
+                }
             }
             const responseUser = await axios.get(`/api/profile/${params.userId}`);
             setIsEditable(false);
@@ -72,7 +87,7 @@ export const Profile = () => {
 
     const handleDeleteProfile = async () => {
         try {
-            const response = await axios.delete(`/api/profile/delete/${userId}`);
+            const response = await axios.delete(`/api/profile/${userId}`);
             navigate("/profiles");
         }
         catch(error){
@@ -88,7 +103,7 @@ export const Profile = () => {
 
     const handleDeleteComment =  async (id) => {
         try {
-            const response = await axios.delete(`/api/comment/delete/${id}`);
+            const response = await axios.delete(`/api/comment/${id}`);
             const newComments = comments.filter(comment => comment.commentId!==id);
             setCommentsList(newComments);
         }
@@ -117,13 +132,13 @@ export const Profile = () => {
             </div>}
             {isEditable && ((user.id ==userId) || (loggedUser.role==="admin")) && <EditProfileForm handleData={handleUpdating} emailData={user.email} usernameData={user.username}/>}
             <p>Favorites</p>
-            {favorites.map(favorite => <Link to={`/posts/${favorite.postId}`} key={favorite.postId}>{favorite.title}</Link>)}
+            {favorites.map(favorite => <Link to={`/post/${favorite.postId}`} key={favorite.postId}>{favorite.title}</Link>)}
             <h4>Activity</h4>
             <h5>Comments</h5>
             {commentsList.map(comment =>
                 <div key={comment.commentId}>
                     <hr/>
-                    <p>At post: <Link to={`/posts/${comment.postId}`}>{comment.title}</Link></p>
+                    <p>At post: <Link to={`/post/${comment.postId}`}>{comment.title}</Link></p>
                     <p>{comment.content}</p>
                     <p>Created at: {formatDate(comment.createdAt.date)}</p>
                     <button onClick={() => handleDeleteComment(comment.commentId)}>Delete comment</button>
@@ -133,7 +148,7 @@ export const Profile = () => {
             {likes.map(like =>
                 <div key={likes.postId}>
                     <hr/>
-                    <p>At post: <Link to={`/posts/${like.postId}`}>{like.title}</Link></p>
+                    <p>At post: <Link to={`/post/${like.postId}`}>{like.title}</Link></p>
                     <p>Created at: {formatDate(like.timestamp?.date)}</p>
                     <hr/>
                 </div>)}

@@ -33,7 +33,7 @@ export const NewPost= () => {
             formData.append('image', image);
             const response = await axios.post("/api/posts/create", formData);
             if(response.status===200){
-                navigate(`/posts/${response.data.id}`);
+                navigate(`/post/en/${response.data.id}`);
             }
         }
         catch(error){

@@ -21,7 +21,7 @@ class TagController extends AbstractController
     }
 
 
-    #[Route('/api/tags/create', name:'createTag', methods:['POST'])]
+    #[Route('/api/tag', name:'createTag', methods:['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     function createTag(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -32,10 +32,10 @@ class TagController extends AbstractController
         $entityManager->persist($newTag);
         $entityManager->flush();
 
-        return new Response('Saved new tag with id '.$newTag->getId());
+        return new JsonResponse(['message' => 'Saved new tag with id '.$newTag->getId()],201);
     }
 
-    #[Route('/api/tags/update', name:'updateTag', methods:['PUT'])]
+    #[Route('/api/tag', name:'updateTag', methods:['PUT'])]
     #[IsGranted('ROLE_ADMIN')]
     function updateTag(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -52,11 +52,11 @@ class TagController extends AbstractController
 
         $entityManager->flush();
 
-        return new Response('Updated tag with id '.$tag->getId());
+        return new JsonResponse(['message' => 'Updated tag with id '.$tag->getId()], 200);
     }
 
 
-    #[Route('/api/tags/delete/{id}', name:'deleteTag', methods:['DELETE'])]
+    #[Route('/api/tag/{id}', name:'deleteTag', methods:['DELETE'])]
     #[IsGranted('ROLE_ADMIN')]
     function deleteTag(EntityManagerInterface $entityManager, string $id): Response
     {
@@ -70,7 +70,7 @@ class TagController extends AbstractController
         return new Response(status: 200);
     }
 
-    #[Route('/api/tags/post/{id}', name:'postTags', methods:['GET'])]
+    #[Route('/api/tag/post/{id}', name:'postTags', methods:['GET'])]
     function getPostTags(EntityManagerInterface $entityManager, string $id): Response
     {
         $tags = $entityManager->getRepository(Tag :: class) ->findByPostId($id);

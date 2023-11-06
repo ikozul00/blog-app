@@ -32,7 +32,7 @@ export const Tags = () => {
         }
 
         try {
-            const response = await axios.post("/api/tags/create", {'name': name});
+            const response = await axios.post("/api/tag", {'name': name});
             setTags([...tags, response.data]);
             setIsVisible(false);
         }

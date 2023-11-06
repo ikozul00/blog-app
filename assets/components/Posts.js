@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useEffect, useState} from "react";
 import {Link, useLoaderData, useParams} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
@@ -8,7 +8,7 @@ const numberOfItemsPerPage = 10;
 
 export const loader = async ({params}) => {
     const language = params.lang ? params.lang : 'en';
-    const labels=await axios.get(`/api/${language}/posts/page`);
+    const labels=await axios.get(`/api/${language}/posts-page`);
     if(labels.status !== 200){
         return{error: "Error while fetching post data."}
     }
@@ -22,46 +22,57 @@ export const Posts = ({}) => {
     const [isLoadMore, setIsLoadMore] = useState(true);
 
     const user = JSON.parse(localStorage.getItem('user'));
+
     const navigation = useNavigate();
     const {title, add, more, search} = useLoaderData();
+
     const params = useParams();
     const language = params.lang ? params.lang : 'en';
 
 
     useEffect( () => {
         const getPosts = async () => {
-            const response = await axios.get(`/api/posts/?page=${page}&&limit=${numberOfItemsPerPage}`);
-            const {postsList, postsCount, currentPageNumber} = response.data;
-            setPosts([...posts, ...postsList ]);
-            if(currentPageNumber*numberOfItemsPerPage < postsCount){
-                setPage(currentPageNumber+1);
+            try{
+                const response = await axios.get(`/api/posts/?page=${page}&&limit=${numberOfItemsPerPage}`);
+                const {postsList, postsCount, currentPageNumber} = response.data;
+                setPosts([...posts, ...postsList ]);
+                if(currentPageNumber*numberOfItemsPerPage < postsCount){
+                    setPage(currentPageNumber+1);
+                }
+                else{
+                    setIsLoadMore(false);
+                }
             }
-            else{
-                setIsLoadMore(false);
+            catch (error){
+                console.log(error);
             }
         }
         getPosts();
     }, []);
 
     const loadMorePosts = async (initialPosts= posts, initialPage = page) => {
-        const requestUrl= filter !=="" ?
-            `/api/posts/?page=${initialPage}&&limit=${numberOfItemsPerPage}&&filter=${filter}` :
-            `/api/posts/?page=${initialPage}&&limit=${numberOfItemsPerPage}`;
-        const response  = await axios.get(requestUrl);
-        const {postsList, postsCount, currentPageNumber} = response.data;
-        setPosts([...initialPosts, ...postsList ]);
-        if(currentPageNumber*numberOfItemsPerPage < postsCount){
-            setPage(currentPageNumber+1);
-            setIsLoadMore(true);
+        try {
+            const requestUrl = filter !== "" ?
+                `/api/posts/?page=${initialPage}&&limit=${numberOfItemsPerPage}&&filter=${filter}` :
+                `/api/posts/?page=${initialPage}&&limit=${numberOfItemsPerPage}`;
+            const response = await axios.get(requestUrl);
+            const {postsList, postsCount, currentPageNumber} = response.data;
+            setPosts([...initialPosts, ...postsList]);
+            if (currentPageNumber * numberOfItemsPerPage < postsCount) {
+                setPage(currentPageNumber + 1);
+                setIsLoadMore(true);
+            } else {
+                setIsLoadMore(false);
+            }
         }
-        else{
-            setIsLoadMore(false);
+        catch(error){
+            console.log(error);
         }
     }
 
 
     const handleAddPost = () => {
-        navigation("/posts/addPost")
+        navigation("/posts/add")
     }
 
     const handleSearch = () => {

@@ -7,13 +7,14 @@ use App\Entity\Post;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class LikesController extends AbstractController
 {
-    #[Route('/api/likes', name:'addLikeToPost', methods:['POST'])]
+    #[Route('/api/like', name:'addLikeToPost', methods:['POST'])]
     function addLikeToPost(Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
@@ -26,6 +27,6 @@ class LikesController extends AbstractController
         $entityManager->persist($newLike);
         $entityManager->flush();
 
-        return new Response('Saved new like with id '.$newLike->getId());
+        return new JsonResponse(['message' => 'Saved new like with id '.$newLike->getId()], status:201);
     }
 }

@@ -13,7 +13,7 @@ export const Comments = ({commentsData, postId}) => {
 
     const handleDelete =  async (id) => {
         try {
-            const response = await axios.delete(`/api/comment/delete/${id}`);
+            const response = await axios.delete(`/api/comment/${id}`);
             const newComments = comments.filter(comment => comment.commentId!==id);
             setComments(newComments);
         }
@@ -41,7 +41,7 @@ export const Comments = ({commentsData, postId}) => {
         }
 
         try {
-            const response = await axios.post("/api/comment/create", {'postId': postId, 'content': newContent});
+            const response = await axios.post("/api/comment", {'postId': postId, 'content': newContent});
             setComments([response.data, ...comments]);
             setIsAdding(false);
         }

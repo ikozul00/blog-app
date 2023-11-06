@@ -50,6 +50,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $query->getResult();
     }
 
+    public function getUserRoles(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT u.email, u.roles
+            FROM App\Entity\User u'
+        );
+
+        return $query->getResult();
+    }
+
     public function deleteUser($id): int
     {
         $entityManager = $this->getEntityManager();

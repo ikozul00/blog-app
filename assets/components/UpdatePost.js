@@ -41,11 +41,10 @@ export const UpdatePost= () => {
             formData.append('content', content);
             formData.append('image', image);
 
-            const response = await axios.post("/api/posts/update", formData);
-            if(response.status===200){
+            const response = await axios.post("/api/post", formData);
+            if(response.status===201){
                 navigate(`/post/en/${post.postId}`);
             }
-            console.log(response);
         }
         catch(error){
             if (error.response) {

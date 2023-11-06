@@ -13,7 +13,6 @@ use App\Entity\User;
 use App\ImageOptimizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,9 +25,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PostsController extends AbstractController
 {
-
-    #[Route('/api/{_locale}/posts/page', name:'getPostsPageParameters', methods:['GET'])]
-    public function getPostsPage(Request $request, TranslatorInterface $translator): Response
+    //fetch labels to be displayed on frontend, in appropriate locale
+    #[Route('/api/{_locale}/posts-page', name:'getPostsPage', methods:['GET'])]
+    public function translatePostsPageParameters(Request $request, TranslatorInterface $translator): Response
     {
         $locale = $request->getLocale();
         $title = $translator->trans('posts.title',[], 'messages', $locale);
@@ -38,8 +37,9 @@ class PostsController extends AbstractController
         return new JsonResponse([ 'title' => $title, 'more' => $more, 'add' => $add, 'search' => $search]);
     }
 
-    #[Route('/api/{_locale}/post/page', name:'getPostPageParameters', methods:['GET'])]
-    public function getPostPage(Request $request, TranslatorInterface $translator): Response
+    //fetch labels to be displayed on frontend, in appropriate locale
+    #[Route('/api/{_locale}/post-page', name:'getPostPage', methods:['GET'])]
+    public function translatePostPageParameters(Request $request, TranslatorInterface $translator): Response
     {
         $locale = $request->getLocale();
         $tagAdd = $translator->trans('post.tagAdd',[], 'messages', $locale);
@@ -53,29 +53,34 @@ class PostsController extends AbstractController
             'favoriteRemove' => $favoriteRemove,'delete' => $delete, 'update' => $update, 'comments' => $comments]);
     }
 
-    #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
+    #[Route('/api/posts',name: 'fetchPosts', methods: ['GET'])]
     function fetchPosts(Request $request, EntityManagerInterface $entityManager, PaginatorInterface $pagination): Response
     {
-        $filter = $request->query->get('filter', "");
-        if(!$filter)
-        {
-            $query=$entityManager->getRepository( Post::class)->getPostsList();
-        }
-        else{
-            $query=$entityManager->getRepository( Post::class)->getPostsListWithFilter('%'.$filter.'%');
-        }
+        try{
+            $filter = $request->query->get('filter', "");
+            if(!$filter)
+            {
+                $query=$entityManager->getRepository( Post::class)->getPostsList();
+            }
+            else{
+                $query=$entityManager->getRepository( Post::class)->getPostsListWithFilter('%'.$filter.'%');
+            }
 
-        $result = $pagination->paginate(
-            $query, /* query NOT result */
-            $request->query->getInt('page', 1), /*page number*/
-            $request->query->getInt('limit', 10) /*limit per page*/
-        );
+            $result = $pagination->paginate(
+                $query, /* query NOT result */
+                $request->query->getInt('page', 1), /*page number*/
+                $request->query->getInt('limit', 10) /*limit per page*/
+            );
+        }
+        catch(\Exception $error){
+            return new JsonResponse(['error' => 'An error occurred while fetching posts.'.$error], 500);
+        }
         return new JsonResponse(['postsList'=>$result->getItems(), 'postsCount'=> $result->getTotalItemCount(),
             'currentPageNumber' => $result->getCurrentPageNumber()]);
     }
 
-    #[Route('/api/post/{id}', methods: ['GET'])]
-    function getPostDetails(EntityManagerInterface $entityManager,Packages $assets, string $id):Response
+    #[Route('/api/post/{id}', name:'fetchPost', methods: ['GET'])]
+    function fetchPost(EntityManagerInterface $entityManager,Packages $assets, string $id):Response
     {
         $data=[];
         $post=$entityManager->getRepository( Post::class)->getPost($id);
@@ -94,8 +99,9 @@ class PostsController extends AbstractController
         else{
             $data['imageUrl'] ="";
         }
-
-        $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($id, 65);
+        $user = $this->getUser();
+        $userData = $entityManager->getRepository(User::class) ->findBy(['email' => $user->getUserIdentifier()]);
+        $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($id, $userData[0]->getId());
         if($isFavorite==0){
             $data['ifFavorite']=false;
         }
@@ -109,7 +115,7 @@ class PostsController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/posts/create',name: 'createPost', methods: ['POST'])]
+    #[Route('/api/post',name: 'createPost', methods: ['POST'])]
     function createPost(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, ImageOptimizer $imageOptimizer, CommonFunctions $commonFunctions): Response
     {
         $newPost = new Post();
@@ -122,17 +128,22 @@ class PostsController extends AbstractController
             $imagePath = $commonFunctions->storeImage($image, $slugger, $imageOptimizer, true);
             $newPost->setImagePath($imagePath);
         }
-        $entityManager->persist($newPost);
-        $entityManager->flush();
-        $id = $newPost->getId();
+        try {
+            $entityManager->persist($newPost);
+            $entityManager->flush();
+            $id = $newPost->getId();
+        }
+        catch(\Exception $error){
+            return new JsonResponse(['error' => 'Error happened while adding post to db.'.$error], 500);
+        }
 
-        return new JsonResponse(['id' => $id]);
+        return new JsonResponse(['id' => $id], 201);
 
     }
 
     //PUT method would send empty request body, can't find how to send multipart-data with PUT
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/posts/update',name: 'updatePost', methods: ['POST'])]
+    #[Route('/api/post-update',name: 'updatePost', methods: ['POST'])]
     function updatePost(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger,
                         ImageOptimizer $imageOptimizer, CommonFunctions $commonFunctions): Response
     {
@@ -154,15 +165,20 @@ class PostsController extends AbstractController
             $post->setImagePath($imagePath);
         }
 
-        $entityManager->flush();
+        try {
+            $entityManager->flush();
+        }
+        catch(\Exception $error){
+            return new JsonResponse(['error' => 'Error happened while updating post in db.'.$error], 500);
+        }
 
-        return new Response('Updated product with id '.$post->getId());
+        return new JsonResponse(['message' => 'Updated product with id '.$post->getId()], 200);
 
     }
 
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/posts/delete/{id}', name:'deletePost', methods: ['DELETE'])]
+    #[Route('/api/post/{id}', name:'deletePost', methods: ['DELETE'])]
     function deletePost(EntityManagerInterface $entityManager, string $id): Response
     {
         $numberOfPosts=$entityManager->getRepository( Post::class)->deletePost($id);
@@ -176,32 +192,34 @@ class PostsController extends AbstractController
 
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/posts/addTag', name:'addTag', methods:['POST'])]
-    function addTag(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/api/post/tag', name:'addTagToPost', methods:['POST'])]
+    function addTagToPost(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
         $post = $entityManager->getRepository(Post::class)->find($data['postId']);
         $tag = $entityManager->getRepository(Tag::class)->find($data['tagId']);
         $isExist = $entityManager->getRepository(PostTag::class) ->count(['post'=>$post, 'tag'=>$tag]);
         if($isExist !== 0){
-            return new Response("Exists.");
+            return new JsonResponse(['message' => 'Exists.'], 400);
         }
 
-        $newConnection = new PostTag();
+        $newRelation = new PostTag();
 
-        $newConnection -> setPost($post);
-        $newConnection -> setTag($tag);
+        $newRelation -> setPost($post);
+        $newRelation -> setTag($tag);
+        try {
+            $entityManager->persist($newRelation);
+            $entityManager->flush();
+        }
+        catch(\Exception $error){
+            return new JsonResponse(['error' => 'Error happened while adding tag to post.'.$error], 500);
+        }
 
-        $entityManager->persist($newConnection);
-        $entityManager->flush();
-        return new Response(status: 200);
+        return new Response(status: 201);
     }
 
-
-
-
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/posts/removeTag', name:'removeTag', methods:['DELETE'])]
+    #[Route('/api/post/tag', name:'removeTag', methods:['DELETE'])]
     function removeTag(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data=json_decode($request->getContent(), true);
@@ -215,18 +233,5 @@ class PostsController extends AbstractController
         return new Response(status: 200);
     }
 
-    #[Route('/api/posts/like/{id}', name:'likePost', methods:['POST'])]
-    function likePost(Request $request, EntityManagerInterface $entityManager, string $id): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
-        $data=json_decode($request->getContent(), true);
-        $newLike = new Likes();
-        $newLike->setPost($entityManager->getRepository(Post::class)->find($id));
-        $newLike->setUser($entityManager->getRepository(User::class) ->find($data['userId']));
-
-        $entityManager->persist($newLike);
-        $entityManager->flush();
-        return new Response(status: 200);
-    }
 
 }
