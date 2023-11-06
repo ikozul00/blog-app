@@ -29,7 +29,15 @@ class PostsController extends AbstractController
     #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
     function fetchPosts(Request $request, EntityManagerInterface $entityManager, PaginatorInterface $pagination): Response
     {
-        $query=$entityManager->getRepository( Post::class)->getPostsList();
+        $filter = $request->query->get('filter', "");
+        if(!$filter)
+        {
+            $query=$entityManager->getRepository( Post::class)->getPostsList();
+        }
+        else{
+            $query=$entityManager->getRepository( Post::class)->getPostsListWithFilter('%'.$filter.'%');
+        }
+
         $result = $pagination->paginate(
             $query, /* query NOT result */
             $request->query->getInt('page', 1), /*page number*/

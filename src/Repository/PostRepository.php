@@ -29,9 +29,19 @@ class PostRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         return $entityManager->createQuery(
-            'SELECT p.title, p.id
-            FROM App\Entity\Post p'
+            'SELECT p.title, p.id, p.createdAt
+            FROM App\Entity\Post p ORDER BY p.createdAt DESC'
         );
+
+    }
+
+    public function getPostsListWithFilter($filter): Query
+    {
+        $entityManager = $this->getEntityManager();
+        return $entityManager->createQuery(
+            'SELECT p.title, p.id, p.createdAt
+            FROM App\Entity\Post p WHERE LOWER(p. title) LIKE LOWER(:filter) ORDER BY p.createdAt DESC'
+        )->setParameter('filter', $filter);
 
     }
 

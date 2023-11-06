@@ -33,17 +33,6 @@ export const Post = ()  => {
     const user = JSON.parse(localStorage.getItem('user'));
     const navigation = useNavigate();
 
-    useEffect(() => {
-        const getTags = async () => {
-            const response = await axios.get(`/api/tags`);
-            if(response.status !== 200){
-                return{error: "Error while fetching tags."}
-            }
-            setAllTags(response.data);
-        }
-        getTags();
-    }, [])
-
     const handleLikeClick = async () => {
         const response = await axios.post(`/api/likes`, {postId:post.postId});
         if(response.status!==200){
