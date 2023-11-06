@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {redirect, useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import {EditProfileForm} from "./EditProfileForm";
 
 export const Registration= () => {

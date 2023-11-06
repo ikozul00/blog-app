@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {formatDate} from "./Post";
+import {formatDate} from "./helperFunctions";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 
@@ -42,7 +42,7 @@ export const Comments = ({commentsData, postId}) => {
 
         try {
             const response = await axios.post("/api/comment/create", {'postId': postId, 'content': newContent});
-            setComments([...comments, response.data]);
+            setComments([response.data, ...comments]);
             setIsAdding(false);
         }
         catch(error){

@@ -26,7 +26,7 @@ class CommentRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
             'SELECT c.content,c.createdAt, c.id AS commentId, u.email, u.id AS userId
-            FROM App\Entity\Comment c JOIN c.user u WHERE c.post= :id'
+            FROM App\Entity\Comment c JOIN c.user u WHERE c.post= :id ORDER BY c.createdAt DESC'
         )->setParameter(key:'id', value:$id);
 
         return $query->getResult();
@@ -49,7 +49,7 @@ class CommentRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
             'SELECT c.content,c.createdAt, c.id AS commentId, p.title, p.id AS postId
-            FROM App\Entity\Comment c JOIN c.post p WHERE c.user= :id'
+            FROM App\Entity\Comment c JOIN c.post p WHERE c.user= :id ORDER BY c.createdAt DESC'
         )->setParameter(key:'id', value:$id);
 
         return $query->getResult();

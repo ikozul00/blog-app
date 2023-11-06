@@ -37,7 +37,7 @@ class LikesRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
             'SELECT p.title, p.id AS postId, l.timestamp  FROM App\Entity\Likes l JOIN l.post p
-            WHERE l.user= :userId'
+            WHERE l.user= :userId ORDER BY l.timestamp DESC'
         )->setParameters(['userId' => $userId]);
         return $query->getResult();
     }

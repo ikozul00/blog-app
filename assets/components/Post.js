@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useLoaderData, useNavigate} from "react-router-dom";
 import {Comments} from "./Comments";
+import {formatDate} from "./helperFunctions";
 
 
 export const loader = async ({params}) => {
@@ -13,10 +14,7 @@ export const loader = async ({params}) => {
     return postData.data;
 }
 
-export const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-}
+
 
 
 export const Post = ()  => {

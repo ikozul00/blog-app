@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
-import {formatDate} from "./Post";
+import {formatDate} from "./helperFunctions";
 
 const numberOfItemsPerPage = 10;
 

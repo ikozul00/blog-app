@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import axios from "axios";
 import {Link, useLoaderData, useNavigate, useNavigation, useParams} from "react-router-dom";
-import {formatDate} from "./Post";
+import {formatDate} from "./helperFunctions";
 import {EditProfileForm} from "./EditProfileForm";
 
 export const loader = async ({params}) => {
@@ -24,6 +24,7 @@ export const Profile = () => {
     const [email, setEmail] = useState(user.email);
     const [username, setUsername] = useState(user.username);
     const [image, setImage] = useState(user.image);
+    const [commentsList, setCommentsList] = useState(comments);
 
     const handleLogout = async() => {
         const response = await axios.get("/api/logout");
@@ -84,7 +85,25 @@ export const Profile = () => {
             }
         }
     }
-    console.log(image);
+
+    const handleDeleteComment =  async (id) => {
+        try {
+            const response = await axios.delete(`/api/comment/delete/${id}`);
+            const newComments = comments.filter(comment => comment.commentId!==id);
+            setCommentsList(newComments);
+        }
+        catch(error){
+            if (error.response) {
+                console.log(error.response);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+        }
+    }
+
+
     return(
         <div>
             <button onClick={handleLogout}>Logout</button>
@@ -101,12 +120,13 @@ export const Profile = () => {
             {favorites.map(favorite => <Link to={`/posts/${favorite.postId}`} key={favorite.postId}>{favorite.title}</Link>)}
             <h4>Activity</h4>
             <h5>Comments</h5>
-            {comments.map(comment =>
+            {commentsList.map(comment =>
                 <div key={comment.commentId}>
                     <hr/>
                     <p>At post: <Link to={`/posts/${comment.postId}`}>{comment.title}</Link></p>
                     <p>{comment.content}</p>
                     <p>Created at: {formatDate(comment.createdAt.date)}</p>
+                    <button onClick={() => handleDeleteComment(comment.commentId)}>Delete comment</button>
                     <hr/>
                 </div>)}
             <h5>Likes</h5>
