@@ -24,10 +24,10 @@ export const loader = async ({params}) => {
 
 
 export const Post = ()  => {
-    const {post, isFavoriteValue, likes, tags, comments, imageUrl, labels} = useLoaderData();
+    const {post, isFavoriteData, likes, tags, comments, imageUrl, labels} = useLoaderData();
 
     const [likeNumber, setLikeNumber] = useState(likes);
-    const [isFavorite, setIsFavorite] = useState(isFavoriteValue);
+    const [isFavorite, setIsFavorite] = useState(isFavoriteData);
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const [selectedTag, setSelectedTag] = useState("");
     const [allTags, setAllTags] = useState([]);

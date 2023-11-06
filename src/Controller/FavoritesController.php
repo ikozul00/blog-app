@@ -18,11 +18,19 @@ class FavoritesController extends AbstractController
     function addPostToFavorites(Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+        $data=json_decode($request->getContent(), true);
+        $user = $this->getUser();
+        $userData = $entityManager->getRepository(User::class) ->findBy(['email' => $user->getUserIdentifier()]);
+        $post = $entityManager->getRepository(Post::class)->find($data['postId']);
+        $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($userData[0]->getId(), $userData[0]->getId());
+        if($isFavorite!=0){
+            return new JsonResponse(['message' => 'Already is in favorites.'], 400);
+        }
         try{
-            $data=json_decode($request->getContent(), true);
+
             $newFavorite = new Favorites();
-            $newFavorite->setUser($this->getUser());
-            $newFavorite->setPost($entityManager->getRepository(Post::class)->find($data['postId']));
+            $newFavorite->setUser($user);
+            $newFavorite->setPost($post);
             $entityManager->persist($newFavorite);
             $entityManager->flush();
         }
@@ -37,7 +45,8 @@ class FavoritesController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         $user = $this->getUser();
-        $numberOfDeleted = $entityManager->getRepository(Favorites::class) -> deletePostFromFavorites($postId, $user->getUserIdentifier());
+        $userData = $entityManager->getRepository(User::class) ->findBy(['email' => $user->getUserIdentifier()]);
+        $numberOfDeleted = $entityManager->getRepository(Favorites::class) -> deletePostFromFavorites($postId, $userData[0]->getId());
 
         if($numberOfDeleted==0){
             throw $this->createNotFoundException(

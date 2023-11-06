@@ -132,7 +132,9 @@ export const Profile = () => {
             </div>}
             {isEditable && ((user.id ==userId) || (loggedUser.role==="admin")) && <EditProfileForm handleData={handleUpdating} emailData={user.email} usernameData={user.username}/>}
             <p>Favorites</p>
-            {favorites.map(favorite => <Link to={`/post/en/${favorite.postId}`} key={favorite.postId}>{favorite.title}</Link>)}
+            {favorites.map(favorite => <div>
+                <Link to={`/post/en/${favorite.postId}`} key={favorite.postId}>{favorite.title}</Link><br/>
+            </div>)}
             <h4>Activity</h4>
             <h5>Comments</h5>
             {commentsList.map(comment =>

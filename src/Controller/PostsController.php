@@ -13,6 +13,7 @@ use App\Entity\User;
 use App\ImageOptimizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -103,10 +104,10 @@ class PostsController extends AbstractController
         $userData = $entityManager->getRepository(User::class) ->findBy(['email' => $user->getUserIdentifier()]);
         $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($id, $userData[0]->getId());
         if($isFavorite==0){
-            $data['ifFavorite']=false;
+            $data['isFavoriteData']=false;
         }
         else{
-            $data['ifFavorite']=true;
+            $data['isFavoriteData']=true;
         }
         $data['likes']=$entityManager->getRepository(Likes::class)->findByPostId($id);
         // Create a JsonResponse and return it
