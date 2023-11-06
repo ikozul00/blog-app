@@ -22,9 +22,36 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PostsController extends AbstractController
 {
+
+    #[Route('/api/{_locale}/posts/page', name:'getPostsPageParameters', methods:['GET'])]
+    public function getPostsPage(Request $request, TranslatorInterface $translator): Response
+    {
+        $locale = $request->getLocale();
+        $title = $translator->trans('posts.title',[], 'messages', $locale);
+        $more = $translator->trans('posts.more',[], 'messages', $locale);
+        $add = $translator->trans('posts.add',[], 'messages', $locale);
+        $search = $translator->trans('posts.search',[], 'messages', $locale);
+        return new JsonResponse([ 'title' => $title, 'more' => $more, 'add' => $add, 'search' => $search]);
+    }
+
+    #[Route('/api/{_locale}/post/page', name:'getPostPageParameters', methods:['GET'])]
+    public function getPostPage(Request $request, TranslatorInterface $translator): Response
+    {
+        $locale = $request->getLocale();
+        $tagAdd = $translator->trans('post.tagAdd',[], 'messages', $locale);
+        $like = $translator->trans('post.like',[], 'messages', $locale);
+        $favorite = $translator->trans('post.favorite',[], 'messages', $locale);
+        $favoriteRemove = $translator->trans('post.favoriteRemove',[], 'messages', $locale);
+        $delete = $translator->trans('post.delete',[], 'messages', $locale);
+        $update = $translator->trans('post.update',[], 'messages', $locale);
+        $comments = $translator->trans('post.comments',[], 'messages', $locale);
+        return new JsonResponse([ 'tagAdd' => $tagAdd, 'like' => $like, 'favorite' => $favorite,
+            'favoriteRemove' => $favoriteRemove,'delete' => $delete, 'update' => $update, 'comments' => $comments]);
+    }
 
     #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
     function fetchPosts(Request $request, EntityManagerInterface $entityManager, PaginatorInterface $pagination): Response
@@ -106,7 +133,8 @@ class PostsController extends AbstractController
     //PUT method would send empty request body, can't find how to send multipart-data with PUT
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/posts/update',name: 'updatePost', methods: ['POST'])]
-    function updatePost(Request $request,LoggerInterface $logger, EntityManagerInterface $entityManager, SluggerInterface $slugger, ImageOptimizer $imageOptimizer, CommonFunctions $commonFunctions): Response
+    function updatePost(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger,
+                        ImageOptimizer $imageOptimizer, CommonFunctions $commonFunctions): Response
     {
         $id = $request->request->get('id');
         $post = $entityManager->getRepository( Post::class)->find($id);
@@ -122,7 +150,7 @@ class PostsController extends AbstractController
         $post->setLastEdited(new \DateTime());
         $image=$request->files->get('image');
         if($image) {
-            $imagePath = $commonFunctions->storeImage($image, $slugger, $imageOptimizer, true);
+            $imagePath = $commonFunctions->storeImage($image, $slugger, $imageOptimizer,true, );
             $post->setImagePath($imagePath);
         }
 

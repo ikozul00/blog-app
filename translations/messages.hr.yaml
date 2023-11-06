@@ -1,0 +1,23 @@
+app:
+  title: Blog Aplikacija
+  posts: Objave
+  login: Prijava
+  registration: Registracija
+  tags: Oznake
+  profile: Profil
+  users: Korisnici
+
+posts:
+  title: Objave
+  more: Učitaj više
+  add: Dodaj novu objavu
+  search: Pretraži
+
+post:
+  tagAdd: Dodaj oznaku
+  like: Sviđa mi se
+  favorite: Favorit
+  favoriteRemove: Makni iz favorita
+  delete: Izbriši objavu
+  update: Izmjeni objavu
+  comments: Komentari

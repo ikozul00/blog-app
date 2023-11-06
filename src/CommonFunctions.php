@@ -21,7 +21,6 @@ class CommonFunctions extends AbstractController
         else{
             $parameter='user_images_directory';
         }
-
         try {
             $image->move(
                 $this->getParameter($parameter),

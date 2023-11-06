@@ -1,0 +1,23 @@
+app:
+    title: Blog App
+    posts: Posts
+    login: Login
+    registration: Registration
+    tags: Tags
+    profile: Profile
+    users: Users
+
+posts:
+    title: Posts
+    more: Load more
+    add: Add new post
+    search: Search
+
+post:
+    tagAdd: Add tag
+    like: Like
+    favorite: Favorite
+    favoriteRemove: Remove from favorites
+    delete: Delete post
+    update: Update post
+    comments: Comments

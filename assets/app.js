@@ -14,7 +14,7 @@ import './bootstrap';
 
 import React from "react";
 import { createRoot } from 'react-dom/client';
-import {Posts} from "./components/Posts";
+import {Posts, loader as postsLoader} from "./components/Posts";
 import {Post, loader as postLoader} from "./components/Post";
 import {
     createBrowserRouter,
@@ -23,7 +23,7 @@ import {
 import ErrorPage from "./components/ErrorPage";
 import {Registration} from "./components/Registration";
 import {Login} from "./components/Login";
-import {Layout} from "./components/Layout";
+import {Layout, loader as layoutLoader} from "./components/Layout";
 import {Profile, loader as profileLoader} from "./components/Profile";
 import {NewPost} from "./components/NewPost";
 import {UpdatePost} from "./components/UpdatePost";
@@ -47,11 +47,13 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage/>,
         children:[
             {
-                path: "/",
+                path: "/:lang?",
                 element: <App/>,
+                defaultParams: {lang:'en'},
+                loader: postsLoader
             },
             {
-                path: "/posts/:postId",
+                path: "/post/:lang/:postId",
                 element: <Post/>,
                 loader: postLoader,
             },
@@ -60,7 +62,7 @@ const router = createBrowserRouter([
                 element: <NewPost/>,
             },
             {
-                path: "/posts/updatePost/:postId",
+                path: "/post/updatePost/:postId",
                 element: <UpdatePost/>,
                 loader: postLoader,
             },

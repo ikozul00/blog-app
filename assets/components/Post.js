@@ -1,24 +1,26 @@
-import React, {useEffect, useState} from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
-import {useLoaderData, useNavigate} from "react-router-dom";
+import {useLoaderData, useNavigate, useParams} from "react-router-dom";
 import {Comments} from "./Comments";
 import {formatDate} from "./helperFunctions";
 
 
 export const loader = async ({params}) => {
+    const language = params.lang ? params.lang : 'en';
+    const labels=await axios.get(`/api/${language}/post/page`);
     const postData = await axios.get(`/api/post/${params.postId}`);
     if(postData.status !== 200){
         return{error: "Error while fetching post data."}
     }
 
-    return postData.data;
+    return {...postData.data, 'labels':labels.data};
 }
 
 
 
 
 export const Post = ()  => {
-    const {post, isFavoriteValue, likes, tags, comments, imageUrl} = useLoaderData();
+    const {post, isFavoriteValue, likes, tags, comments, imageUrl, labels} = useLoaderData();
 
     const [likeNumber, setLikeNumber] = useState(likes);
     const [isFavorite, setIsFavorite] = useState(isFavoriteValue);
@@ -30,6 +32,19 @@ export const Post = ()  => {
 
     const user = JSON.parse(localStorage.getItem('user'));
     const navigation = useNavigate();
+    const params = useParams();
+    const language = params.lang ? params.lang : 'en';
+
+    useEffect(() => {
+        const getTags = async () => {
+            const response = await axios.get(`/api/tags`);
+            if(response.status !== 200){
+                return{error: "Error while fetching tags."}
+            }
+            setAllTags(response.data);
+        }
+        getTags();
+    }, [])
 
     const handleLikeClick = async () => {
         const response = await axios.post(`/api/likes`, {postId:post.postId});
@@ -75,7 +90,7 @@ export const Post = ()  => {
     }
 
     const handleUpdatePost = () =>{
-        navigation(`/posts/updatePost/${post.postId}`)
+        navigation(`/post/updatePost/${post.postId}`)
     }
 
     const handleTagOption = (e) => {
@@ -115,9 +130,9 @@ export const Post = ()  => {
             {imageUrl!==""  && <img src={imageUrl} alt={"post image"}/>}
             <p>{post?.content}</p>
             <p>by {post?.email}</p>
-            <p>Created: {formatDate(post?.createdAt.date)}</p>
+            <p>Created: {formatDate(post?.createdAt.date, language)}</p>
             {
-                post?.lastEdited && <p>Edited: {formatDate(post?.lastEdited.date)}</p>
+                post?.lastEdited && <p>Edited: {formatDate(post?.lastEdited.date, language)}</p>
             }
 
             <div>
@@ -126,7 +141,7 @@ export const Post = ()  => {
                     postTags?.map(tag => <span key={tag.id}>{tag.name}</span>
                     )
                 }
-                {!isDropdownVisible && user && user.role==='admin' && <button onClick={handleDropdownVisible}>Add tag</button>}
+                {!isDropdownVisible && user && user.role==='admin' && <button onClick={handleDropdownVisible}>{labels.tagAdd}</button>}
                 {isDropdownVisible && <div>
                     <select onChange={handleTagOption}  id="tags" value={selectedTag}>
                         {
@@ -138,16 +153,16 @@ export const Post = ()  => {
                 </div>}
             </div>
             <div>
-                <span>Likes: {likeNumber} </span>
-                {user && <button onClick={handleLikeClick}>Add like</button>}
+                <span>{labels.like}: {likeNumber} </span>
+                {user && <button onClick={handleLikeClick}>{labels.like}</button>}
             </div>
-            {user && <button onClick={handleFavoriteClick}>{isFavorite ? "unfavorite" : "favorite"}</button>}
+            {user && <button onClick={handleFavoriteClick}>{isFavorite ? labels.favoriteRemove : labels.favorite}</button>}
             <br/>
-            {user && user.role==="admin" && <button onClick={handleDeletePost}> Delete Post</button>}
+            {user && user.role==="admin" && <button onClick={handleDeletePost}> {labels.delete}</button>}
             <br/>
-            {user && user.role==="admin" && <button onClick={handleUpdatePost}> Update Post</button>}
+            {user && user.role==="admin" && <button onClick={handleUpdatePost}> {labels.update}</button>}
             <div>
-                <h3>Comments</h3>
+                <h3>{labels.comments}</h3>
                 <Comments commentsData={comments} postId={post.postId}></Comments>
             </div>
 

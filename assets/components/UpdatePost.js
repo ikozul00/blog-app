@@ -43,7 +43,7 @@ export const UpdatePost= () => {
 
             const response = await axios.post("/api/posts/update", formData);
             if(response.status===200){
-                navigate(`/posts/${post.postId}`);
+                navigate(`/post/en/${post.postId}`);
             }
             console.log(response);
         }

@@ -1,12 +1,19 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {Link} from "react-router-dom";
+import {Link, useLoaderData, useParams} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import {formatDate} from "./helperFunctions";
 
 const numberOfItemsPerPage = 10;
 
-
+export const loader = async ({params}) => {
+    const language = params.lang ? params.lang : 'en';
+    const labels=await axios.get(`/api/${language}/posts/page`);
+    if(labels.status !== 200){
+        return{error: "Error while fetching post data."}
+    }
+    return labels.data;
+}
 
 export const Posts = ({}) => {
     const [posts, setPosts] = useState([]);
@@ -16,6 +23,9 @@ export const Posts = ({}) => {
 
     const user = JSON.parse(localStorage.getItem('user'));
     const navigation = useNavigate();
+    const {title, add, more, search} = useLoaderData();
+    const params = useParams();
+    const language = params.lang ? params.lang : 'en';
 
 
     useEffect( () => {
@@ -58,24 +68,29 @@ export const Posts = ({}) => {
         loadMorePosts([], 1);
     }
 
+    const handleLanguageChange = () =>{
+        navigation('/hr');
+    }
+
     return (
         <>
-            <h1>Posts</h1>
+            <button onClick={handleLanguageChange}>Hrvatski</button>
+            <h1>{title}</h1>
             <input type={"text"} value={filter} name={"filter"} id={"filter"}
                    onChange={(e) => setFilter(e.target.value)}/>
-            <button onClick={handleSearch}>Search</button>
+            <button onClick={handleSearch}>{search}</button>
             <div>
             {posts.map(post =>
             {
                 return(
                 <div key={post.id}>
-                    <Link to={`/posts/${post.id}`} >{post.title}</Link>
-                    <span>{formatDate(post.createdAt.date)}</span>
+                    <Link to={`/post/${language}/${post.id}`} >{post.title}</Link>
+                    <span>{formatDate(post.createdAt.date, language)}</span>
                 </div>
             )})}
             </div>
-            {isLoadMore && <button onClick={() => loadMorePosts()}>Load More</button>}<br/>
-            {user && user.role==="admin" && <button onClick={handleAddPost}>Add new</button>}
+            {isLoadMore && <button onClick={() => loadMorePosts()}>{more}</button>}<br/>
+            {user && user.role==="admin" && <button onClick={handleAddPost}>{add}</button>}
         </>
     )
 }
