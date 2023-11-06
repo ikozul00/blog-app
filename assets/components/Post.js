@@ -5,7 +5,7 @@ import {Comments} from "./Comments";
 
 
 export const loader = async ({params}) => {
-    const postData = await axios.get(`/api/posts/${params.postId}`);
+    const postData = await axios.get(`/api/post/${params.postId}`);
     if(postData.status !== 200){
         return{error: "Error while fetching post data."}
     }

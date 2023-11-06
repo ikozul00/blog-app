@@ -12,6 +12,7 @@ use App\Entity\Tag;
 use App\Entity\User;
 use App\ImageOptimizer;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Asset\Packages;
@@ -26,13 +27,19 @@ class PostsController extends AbstractController
 {
 
     #[Route('/api/posts',name: 'postsList', methods: ['GET'])]
-    function fetchPosts(EntityManagerInterface $entityManager): Response
+    function fetchPosts(Request $request, EntityManagerInterface $entityManager, PaginatorInterface $pagination): Response
     {
-        $posts=$entityManager->getRepository( Post::class)->getPostsList();
-        return new JsonResponse($posts);
+        $query=$entityManager->getRepository( Post::class)->getPostsList();
+        $result = $pagination->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            $request->query->getInt('limit', 10) /*limit per page*/
+        );
+        return new JsonResponse(['postsList'=>$result->getItems(), 'postsCount'=> $result->getTotalItemCount(),
+            'currentPageNumber' => $result->getCurrentPageNumber()]);
     }
 
-    #[Route('/api/posts/{id}', methods: ['GET'])]
+    #[Route('/api/post/{id}', methods: ['GET'])]
     function getPostDetails(EntityManagerInterface $entityManager,Packages $assets, string $id):Response
     {
         $data=[];

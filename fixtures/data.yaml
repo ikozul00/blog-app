@@ -15,7 +15,7 @@ App\Entity\User:
     roles: [ 'ROLE_USER' ]
 
 App\Entity\Post:
-  post_{1..10}:
+  post_{1..50}:
     title: '<realText(60, 2)>'
     content: '<realTextBetween(160, 300, 2)>'
     createdAt: '<dateTimeBetween("-100 days", "now")>'

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -24,15 +25,14 @@ class PostRepository extends ServiceEntityRepository
 //    /**
 //     * @return Post[] Returns an array of Post objects
 //     */
-    public function getPostsList(): array
+    public function getPostsList(): Query
     {
         $entityManager = $this->getEntityManager();
-        $query = $entityManager->createQuery(
+        return $entityManager->createQuery(
             'SELECT p.title, p.id
             FROM App\Entity\Post p'
         );
 
-        return $query->getResult();
     }
 
     public function deletePost($id): int
