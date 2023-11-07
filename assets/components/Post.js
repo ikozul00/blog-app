@@ -167,7 +167,7 @@ export const Post = ()  => {
                 <span>{labels.like}: {likeNumber} </span>
                 {user && <button onClick={handleLikeClick}>{labels.like}</button>}
             </div>
-            {user && <button onClick={handleFavoriteClick}>{isFavorite ? labels.favoriteRemove : labels.favorite}</button>}
+            {user &&  <button onClick={handleFavoriteClick}>{isFavorite ? labels.favoriteRemove : labels.favorite}</button>}
             <br/>
             {user && user.role==="admin" && <button onClick={handleDeletePost}> {labels.delete}</button>}
             <br/>

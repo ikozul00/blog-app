@@ -101,13 +101,14 @@ class PostsController extends AbstractController
             $data['imageUrl'] ="";
         }
         $user = $this->getUser();
-        $userData = $entityManager->getRepository(User::class) ->findBy(['email' => $user->getUserIdentifier()]);
-        $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($id, $userData[0]->getId());
-        if($isFavorite==0){
-            $data['isFavoriteData']=false;
-        }
-        else{
-            $data['isFavoriteData']=true;
+        if($user) {
+            $userData = $entityManager->getRepository(User::class)->findBy(['email' => $user->getUserIdentifier()]);
+            $isFavorite = $entityManager->getRepository(Favorites::class)->findByUserAndPostId($id, $userData[0]->getId());
+            if ($isFavorite == 0) {
+                $data['isFavoriteData'] = false;
+            } else {
+                $data['isFavoriteData'] = true;
+            }
         }
         $data['likes']=$entityManager->getRepository(Likes::class)->findByPostId($id);
         // Create a JsonResponse and return it
