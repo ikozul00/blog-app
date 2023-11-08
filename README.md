@@ -16,6 +16,7 @@ To populate a database with some initial data run **php bin/console hautelook:fi
 Before starting a server run: **yarn install** and **composer install** to install dependancies.
 
 To start a server run: **symfony sever:start**
+Now you can access app at https://127.0.0.1:8000.
 
 If app is still not working run **yarn run encore dev** before starting a server.
 
