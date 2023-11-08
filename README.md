@@ -13,7 +13,11 @@ To create a database sheme run **php bin/console doctrine:migrations:migrate** (
 
 To populate a database with some initial data run **php bin/console hautelook:fixtures:load** (NelmioAliceBundle - fixtures are defined in folder fixtures).  
 
+Before starting a server run: **yarn install** and **composer install** to install dependancies.
+
 To start a server run: **symfony sever:start**
+
+If app is still not working run **yarn run encore dev** before starting a server.
 
 ### Not implemented features
 
