@@ -13,7 +13,7 @@ To create a database sheme run **php bin/console doctrine:migrations:migrate** (
 
 To populate a database with some initial data run **php bin/console hautelook:fixtures:load** (NelmioAliceBundle - fixtures are defined in folder fixtures).  
 
-Before starting a server run: **yarn install** and **composer install** to install dependancies.
+Before starting a server run: **yarn install** and **composer install** to install dependancies. Create .env file based on .env.example.
 
 To start a server run: **symfony sever:start**
 Now you can access app at https://127.0.0.1:8000.
